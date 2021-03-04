@@ -75,11 +75,12 @@ function tab_advanced(){
 
 // Create tabs and activate current tab
 function plugin_options_tabs($current_tab, $plugin_tabs) {
+    $cad = (strpos(DCMS_SUBMENU,'?')) ? "&" : '?';
 
     echo '<h2 class="nav-tab-wrapper">';
     foreach ( $plugin_tabs as $tab_key => $tab_caption ) {
         $active = $current_tab == $tab_key ? 'nav-tab-active' : '';
-        echo "<a class='nav-tab " . $active . "' href='".admin_url( DCMS_SUBMENU . "&page=update-users-excel&tab=" . $tab_key )."'>" . $tab_caption . '</a>';
+        echo "<a class='nav-tab " . $active . "' href='".admin_url( DCMS_SUBMENU . $cad . "page=update-users-excel&tab=" . $tab_key )."'>" . $tab_caption . '</a>';
     }
     echo '</h2>';
 }

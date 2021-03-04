@@ -14,28 +14,14 @@ class Plugin{
     // Activate plugin - create options and database table
     public function dcms_activation_plugin(){
 
-        // Default Options
-        $options = get_option( 'dcms_user_excel_options' );
-
-        // if ( empty($options) ){
-        //     $options = [
-        //                  'dcms_usexcel_input_file'  => '/home/public_html/file.xlsx',
-        //                  'dcms_usexcel_sheet_field' => '3',
-        //                  'dcms_usexcel_sku_field'	=> 'Sku',
-        //                  'dcms_usexcel_stock_field'	=> 'Stock',
-        //                  'dcms_usexcel_price_field'	=> 'Price'
-        //          ];
-        //     update_option('dcms_user_excel_options', $options);
-        // }
-
         // Default
         if ( ! get_option('dcms_last_modified_file') ){
             update_option('dcms_last_modified_file', 0);
         }
 
         // Create table
-        // $db = new Database();
-        // $db->create_table();
+        $db = new Database();
+        $db->create_table();
 
         // // Create cron
         // if( ! wp_next_scheduled( 'dcms_cron_hook' ) ) {
@@ -50,4 +36,3 @@ class Plugin{
     }
 
 }
-

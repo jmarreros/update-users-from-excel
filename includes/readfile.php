@@ -95,6 +95,12 @@ class Readfile{
         return false;
     }
 
+    // Public get_sheets file
+    public function get_sheets(){
+        $sheets = array_keys($this->xlsx->sheetNames());
 
+        return implode(',', $sheets);
+
+    }
 }
 

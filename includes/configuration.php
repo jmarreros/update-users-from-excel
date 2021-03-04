@@ -46,50 +46,20 @@ class Configuration{
                                 'required' => true]
         );
 
-        add_settings_field('dcms_usexcel_sku_field',
-                            __('SKU column name','dcms-update-users-excel'),
+        $config_fields = get_config_fields();
+
+        foreach ($config_fields as $key => $value) {
+            $field_name = "dcms_usexcel_${key}_field";
+            $field_msg  = "${value} column name";
+            add_settings_field( $field_name,
+                            __($field_msg,'dcms-update-users-excel'),
                             [$this, 'dcms_section_input_cb'],
                             'dcms_usexcel_sfields',
                             'dcms_usexcel_section_excel',
-                            ['label_for' => 'dcms_usexcel_sku_field',
-                             'required' => true]
-        );
+                            ['label_for' => $field_name]
+            );
 
-        add_settings_field('dcms_usexcel_stock_field',
-                            __('Stock column name','dcms-update-users-excel'),
-                            [$this, 'dcms_section_input_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_excel',
-                            ['label_for' => 'dcms_usexcel_stock_field',
-                            'required' => true]
-        );
-
-        add_settings_field('dcms_usexcel_price_field',
-                            __('Price column name','dcms-update-users-excel'),
-                            [$this, 'dcms_section_input_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_excel',
-                            ['label_for' => 'dcms_usexcel_price_field']
-        );
-
-
-        add_settings_field('dcms_usexcel_product_field',
-                            __('Product column name','dcms-update-users-excel'),
-                            [$this, 'dcms_section_input_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_excel',
-                            ['label_for' => 'dcms_usexcel_product_field']
-                        );
-
-
-        add_settings_field('dcms_usexcel_state_field',
-                            __('State column name','dcms-update-users-excel'),
-                            [$this, 'dcms_section_input_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_excel',
-                            ['label_for' => 'dcms_usexcel_state_field',
-                             'description' => __('Column with values: 1 publish - 0 Unpublish','dcms-update-users-excel')]
-        );
+        }
 
 
         add_settings_section('dcms_usexcel_section_cron',
@@ -185,18 +155,23 @@ class Configuration{
         $sheet_number = $output['dcms_usexcel_sheet_field'];
 
         $columns = [];
-        $columns['SKU']     = $output['dcms_usexcel_sku_field'];
-        $columns['Stock']   = $output['dcms_usexcel_stock_field'];
-        $columns['Price']   = $output['dcms_usexcel_price_field'];
-        $columns['State']   = $output['dcms_usexcel_state_field'];
-        $columns['Product'] = $output['dcms_usexcel_product_field'];
+        $config_fields = get_config_fields();
+
+        foreach ($config_fields as $key => $value) {
+            $name = "dcms_usexcel_${key}_field";
+            $columns[$value] = $output[$name];
+        }
 
         // Read file and validate sheet_number headers
         $readfile = new Readfile($path_file);
         $headers = $readfile->get_header($sheet_number);
+        $sheets = $readfile->get_sheets();
 
         if ( ! $headers ) {
-            add_settings_error( 'dcms_messages', 'dcms_file_error', __( 'Headers columns in .xls file doesn\'t exists', 'dcms-update-users-excel' ), 'error' );
+            add_settings_error( 'dcms_messages', 'dcms_file_error', __( 'Headers columns in .xlsx file doesn\'t exists', 'dcms-update-users-excel' ), 'error' );
+            add_settings_error( 'dcms_messages', 'dcms_file_error', __( 'Try this sheets number: ', 'dcms-update-users-excel' ). $sheets, 'error' );
+
+
             return false;
         }
 

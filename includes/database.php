@@ -10,7 +10,7 @@ class Database{
         global $wpdb;
         $this->wpdb = $wpdb;
 
-        $this->table_name = $this->wpdb->prefix . 'dcms_update_stock';
+        $this->table_name = $this->wpdb->prefix . 'dcms_update_users';
     }
 
     // Insert data
@@ -64,14 +64,24 @@ class Database{
     public function create_table(){
         $sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
                     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                    `sku` varchar(50) DEFAULT NULL,
-                    `product` varchar(250) DEFAULT NULL,
-                    `stock` int(10) unsigned DEFAULT NULL,
-                    `price` decimal(6,2) DEFAULT NULL,
-                    `state` tinyint(1) DEFAULT '1',
+                    `pin` int(10) unsigned DEFAULT NULL,
+                    `number` int(10) unsigned DEFAULT NULL,
+                    `reference` varchar(50) DEFAULT NULL,
+                    `nif` varchar(50) DEFAULT NULL,
+                    `name` varchar(150) DEFAULT NULL,
+                    `first_lastname` varchar(150) DEFAULT NULL,
+                    `second_lastname` varchar(150) DEFAULT NULL,
+                    `birth` datetime DEFAULT NULL,
+                    `sub_type` varchar(150) DEFAULT NULL,
+                    `address` varchar(250) DEFAULT NULL,
+                    `postal_code` varchar(50) DEFAULT NULL,
+                    `email` varchar(100) DEFAULT NULL,
+                    `phone` varchar(50) DEFAULT NULL,
+                    `mobile` varchar(50) DEFAULT NULL,
+                    `observation` varchar(250) DEFAULT NULL,
+                    `id_user` int(10) unsigned DEFAULT NULL,
                     `date_update` datetime DEFAULT NULL,
                     `date_file` int(10) unsigned NOT NULL DEFAULT '0',
-                    `updated` tinyint(1) DEFAULT '0',
                     `excluded` tinyint(1) DEFAULT '0',
                     PRIMARY KEY (`id`)
           )";

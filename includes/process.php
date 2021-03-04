@@ -31,18 +31,11 @@ class Process{
         if ( $last_modified >= get_option('dcms_last_modified_file') ){
 
             $this->rows_into_table($file, $last_modified);
-            update_option('dcms_last_modified_file', $last_modified );
-
-            error_log(Date("h:i:sa").' - Fecha archivo modificada: '. $last_modified);
-            // TODO
-            // wp_update_post( array( 'ID' => $product->get_id(), 'post_status' => 'pending' ) );
-            // Todos los que tienen 0 y existen los actualizo, despublicado
-            // Todos los que tienen 0 y no existen los creo y despublicado
-            // Hacer un left join
+            // update_option('dcms_last_modified_file', $last_modified );
         }
 
         // update stock products in batch process
-        $this->update_products(DCMS_COUNT_BATCH_PROCESS);
+        // $this->update_products(DCMS_COUNT_BATCH_PROCESS);
 
         exit_process(1, $redirection);
 
@@ -107,6 +100,10 @@ class Process{
         if ( ! $data ) return false;
 
         $headers_ids = $file->get_headers_ids();
+
+        error_log(print_r($headers_ids,true));
+
+        return;
 
         // Validate required columns
         if ( $headers_ids['sku'] < 0 || $headers_ids['stock'] < 0 ){
