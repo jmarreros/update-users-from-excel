@@ -33,11 +33,11 @@ class Database{
     public function select_table_filter($limit = 0){
 
         $last_modified = get_option('dcms_last_modified_file');
-        $table_postmeta = $this->wpdb->prefix."postmeta";
+        $table_usermeta = $this->wpdb->prefix."usermeta";
 
-        $sql = "SELECT us.*, pm.post_id FROM {$this->table_name} us
-                INNER JOIN {$table_postmeta} pm ON us.sku = pm.meta_value AND pm.meta_key = '_sku'
-                WHERE us.date_file = {$last_modified} AND us.date_update IS NULL AND us.excluded = 0 AND us.state = 1";
+        $sql = "SELECT * FROM {$this->table_name} uu
+                LEFT JOIN {$table_usermeta} um ON uu.number = um.meta_value AND um.meta_key = 'number'
+                WHERE uu.date_file = {$last_modified} AND uu.date_update IS NULL AND uu.excluded = 0";
 
         if ( $limit > 0 ) $sql .= " LIMIT {$limit}";
 
@@ -64,6 +64,7 @@ class Database{
     public function create_table(){
         $sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
                     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                    `identify` int(10) unsigned DEFAULT NULL,
                     `pin` int(10) unsigned DEFAULT NULL,
                     `number` int(10) unsigned DEFAULT NULL,
                     `reference` varchar(50) DEFAULT NULL,
@@ -75,11 +76,15 @@ class Database{
                     `sub_type` varchar(150) DEFAULT NULL,
                     `address` varchar(250) DEFAULT NULL,
                     `postal_code` varchar(50) DEFAULT NULL,
+                    `local` varchar(100) DEFAULT NULL,
                     `email` varchar(100) DEFAULT NULL,
                     `phone` varchar(50) DEFAULT NULL,
                     `mobile` varchar(50) DEFAULT NULL,
-                    `observation` varchar(250) DEFAULT NULL,
-                    `id_user` int(10) unsigned DEFAULT NULL,
+                    `soc_type` varchar(50) DEFAULT NULL,
+                    `observation7` varchar(250) DEFAULT NULL,
+                    `observation5` varchar(250) DEFAULT NULL,
+                    `sub_permit`  varchar(100) DEFAULT NULL,
+                    -- `id_user` int(10) unsigned DEFAULT NULL,
                     `date_update` datetime DEFAULT NULL,
                     `date_file` int(10) unsigned NOT NULL DEFAULT '0',
                     `excluded` tinyint(1) DEFAULT '0',
@@ -93,6 +98,12 @@ class Database{
     // Truncate table
     public function truncate_table(){
         $sql = "TRUNCATE TABLE {$this->table_name};";
+        $this->wpdb->query($sql);
+    }
+
+    // Detelete table on desactivate
+    public function drop_table(){
+        $sql = "DROP TABLE IF EXISTS {$this->table_name};";
         $this->wpdb->query($sql);
     }
 }

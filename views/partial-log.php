@@ -65,6 +65,12 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 <strong><?php echo __('Last modified Excel file process: ', 'dcms-update-users-excel') . date('d/m/Y - H:m:s', $last_modified_file) ?></strong>
 </section>
 <table class="dcms-table">
+
+<?php
+// TODO
+exit();
+?>
+
 <?php foreach ($rows as $key => $item):  ?>
     <tr class="<?= $item->updated?'updated':'' ?>" >
     <?php if ( $key == 0 ): ?>

@@ -31,63 +31,59 @@ class Process{
         if ( $last_modified >= get_option('dcms_last_modified_file') ){
 
             $this->rows_into_table($file, $last_modified);
-            // update_option('dcms_last_modified_file', $last_modified );
+            update_option('dcms_last_modified_file', $last_modified );
         }
 
-        // update stock products in batch process
-        // $this->update_products(DCMS_COUNT_BATCH_PROCESS);
+        // update users in batch process
+        $this->update_users(DCMS_COUNT_BATCH_PROCESS);
 
         exit_process(1, $redirection);
 
     }
 
-
     // Update products stock
-    private function update_products($count){
+    private function update_users($count){
         $table = new Database();
 
-        // Get the items to work with in batch process
         $items = $table->select_table_filter($count);
 
-        error_log(Date("h:i:sa").' - Actualizaremos '. $count.' registros');
+        // TODO
+        // - Obtener el user_id, si existe será actualización
+        // - Sino existe será un usuario nuevo
 
         foreach ($items as $item) {
-
-            // Get the product object
-            $product = wc_get_product($item->post_id);
-
-            // Validate only simple products
-            if ( $product->get_type() == 'simple'){
-                $price = $product->get_price();
-                $stock = $product->get_stock_quantity();
-
-                // If price has changed
-                if ( ! is_null($item->price) && $price !== $item->price){
-                    $this->update_product_price($product, $item->price);
-                }
-
-                // If stock has changed
-                if ( $stock !== $item->stock ){
-                    wc_update_product_stock($product, $item->stock);
-                }
-
-                // Update table log
-                $table->update_item_table($item->id);
-
-            } else {
-                // Exclude item because is not simple product
-                $table->exclude_item_table($item->id);
+            // New user
+            if ( is_null($item->user_id ) ){
+                $this->insert_new_user( $item );
             }
 
         }
     }
 
-    // Update price of a specific product object
-    private function update_product_price($product, $new_price){
-        $product->set_regular_price($new_price);
-        $product->set_sale_price($new_price);
-        $product->set_price($new_price);
-        $product->save();
+
+    private function insert_new_user($item){
+
+        $item->email = ! empty( $item->email) ? $item->email : $item->number.'@tmp.com';
+
+        $user_data = array(
+            'user_login'    => $item->number,
+            'user_pass'     => md5($item->number),
+            'display_name'  => $item->name,
+            'user_email'    => $item->email
+            );
+
+        $id_user = wp_insert_user($user_data);
+
+        // Validate
+        if ( ! is_wp_error( $id_user ) ) {
+            // Add meta data
+            error_log(print_r($id_user,true));
+
+        } else {
+            error_log("El usuario con número {$item->number} No se creó correctamente");
+            error_log($id_user->get_error_message());
+        }
+
     }
 
 
@@ -97,19 +93,23 @@ class Process{
         $data = $file->get_data_from_file();
 
         // Validate get data from file
-        if ( ! $data ) return false;
+        if ( ! $data ) {
+            error_log("No data or incorrect sheet");
+            return false;
+        };
 
         $headers_ids = $file->get_headers_ids();
+        $config_required_fields = get_config_required_fields();
 
-        error_log(print_r($headers_ids,true));
-
-        return;
-
-        // Validate required columns
-        if ( $headers_ids['sku'] < 0 || $headers_ids['stock'] < 0 ){
-            return false;
+        // Validation required fields
+        foreach ($config_required_fields as $key => $value) {
+            if ( $headers_ids[$key] < 0 ) {
+                error_log("Error Field: {$key} is required");
+                return false;
+            }
         }
 
+        // Data base
         $table = new Database();
 
         // Clear data
@@ -119,31 +119,63 @@ class Process{
             if ( $key == 0 ) continue; // Exclude first line
 
             $row = [];
-            if ( $item[$headers_ids['sku']] ){
 
-                $row['date_file'] =  $last_modified;
-                $row['sku']     = $item[$headers_ids['sku']];
-                $row['stock']   = $item[$headers_ids['stock']];
+            foreach ($headers_ids as $key => $value) {
+                if ( ! empty($item[$value]) ){
 
-                if ( $headers_ids['price'] >= 0 ){
-                    $row['price']   = $item[$headers_ids['price']];
+                    if ( $key == 'birth' ){ // for dates
+                        $time = strtotime($item[$value]);
+                        $newformat = date('Y-m-d',$time);
+                        $row[$key] = $newformat;
+                    } else {
+                        $row[$key] = $item[$value];
+                    }
+
                 }
-
-                if ( $headers_ids['state'] >= 0 ){
-                    $row['state']   = $item[$headers_ids['state']];
-                }
-
-                if ( $headers_ids['product'] >= 0 ){
-                    $row['product']   = $item[$headers_ids['product']];
-                }
-
-                $table->insert_data($row);
             }
+
+            $row['date_file'] =  $last_modified;
+
+            $table->insert_data($row);
         }
 
     }
 
 }
 
-// Verify state for create products
-// Truncar la tabla para empezar de 0
+
+
+// // Get the items to work with in batch process
+// $items = $table->select_table_filter($count);
+
+// error_log(Date("h:i:sa").' - Actualizaremos '. $count.' registros');
+
+// foreach ($items as $item) {
+
+//     // Get the product object
+//     $product = wc_get_product($item->post_id);
+
+//     // Validate only simple products
+//     if ( $product->get_type() == 'simple'){
+//         $price = $product->get_price();
+//         $stock = $product->get_stock_quantity();
+
+//         // If price has changed
+//         if ( ! is_null($item->price) && $price !== $item->price){
+//             $this->update_product_price($product, $item->price);
+//         }
+
+//         // If stock has changed
+//         if ( $stock !== $item->stock ){
+//             wc_update_product_stock($product, $item->stock);
+//         }
+
+//         // Update table log
+//         $table->update_item_table($item->id);
+
+//     } else {
+//         // Exclude item because is not simple product
+//         $table->exclude_item_table($item->id);
+//     }
+
+// }

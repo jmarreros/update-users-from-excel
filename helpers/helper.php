@@ -2,7 +2,8 @@
 
 // Columns
 function get_config_fields(){
-    $config_fields = [
+    return [
+        'identify'  => 'Identify',
         'pin'       => 'PIN',
         'number'    => 'Number',
         'reference' => 'Reference',
@@ -14,12 +15,24 @@ function get_config_fields(){
         'sub_type'  => 'Subscriber Type',
         'address'   => 'Address',
         'postal_code'   => 'Postal Code',
+        'local'     => 'Locate',
         'email'     => ' Email',
         'phone'     => 'Phone',
         'mobile'    => 'Mobile',
-        'observation'   => 'Observation'
+        'soc_type'  => 'Socio Type',
+        'observation7'   => 'Observation 7',
+        'observation5'   => 'Observation 5',
+        'sub_permit'=> 'Subscription permit'
     ];
-    return $config_fields;
+}
+
+function get_config_required_fields(){
+    return [
+        'pin'       => 'PIN',
+        'number'    => 'Number',
+        'reference' => 'Reference',
+        'name'      => 'Name',
+    ];
 }
 
 
