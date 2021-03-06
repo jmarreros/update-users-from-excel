@@ -31,12 +31,17 @@ class Database{
 
     // Select table for last modified date and not date_modified related with product id
     public function select_table_filter($limit = 0){
+        // Tmp delete users
+        // for ($i=2; $i <=9; $i++) {
+        //     wp_delete_user($i);
+        // }
 
-        $last_modified = get_option('dcms_last_modified_file');
-        $table_usermeta = $this->wpdb->prefix."usermeta";
 
-        $sql = "SELECT * FROM {$this->table_name} uu
-                LEFT JOIN {$table_usermeta} um ON uu.number = um.meta_value AND um.meta_key = 'number'
+        $last_modified  = get_option('dcms_last_modified_file');
+        $table_user     = $this->wpdb->prefix."users";
+
+        $sql = "SELECT *, u.id user_id FROM {$this->table_name} uu
+                LEFT JOIN {$table_user} u ON uu.number = u.user_login
                 WHERE uu.date_file = {$last_modified} AND uu.date_update IS NULL AND uu.excluded = 0";
 
         if ( $limit > 0 ) $sql .= " LIMIT {$limit}";
@@ -46,7 +51,7 @@ class Database{
 
     // Update log table
     public function update_item_table($id_table){
-        $sql = "UPDATE {$this->table_name} SET date_update = NOW(), updated = 1
+        $sql = "UPDATE {$this->table_name} SET date_update = NOW()
                 WHERE id = {$id_table}";
 
         $this->wpdb->query($sql);

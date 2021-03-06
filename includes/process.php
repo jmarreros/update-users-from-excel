@@ -43,6 +43,7 @@ class Process{
 
     // Update products stock
     private function update_users($count){
+
         $table = new Database();
 
         $items = $table->select_table_filter($count);
@@ -52,25 +53,34 @@ class Process{
         // - Sino existe será un usuario nuevo
 
         foreach ($items as $item) {
-            // New user
-            if ( is_null($item->user_id ) ){
-                $this->insert_new_user( $item );
+
+            // Insert or update a user
+            $id_user = $this->insert_new_user( $item );
+
+            if ( $id_user ){
+                $table->update_item_table($item->id);
+            } else{
+                $table->exclude_item_table($item->id);
             }
 
         }
     }
 
-
+    // Inserte new user
     private function insert_new_user($item){
+        $user_data  = [];
+        $user_data['display_name'] = $item->name;
+        $user_data['user_login'] = $item->number;
 
-        $item->email = ! empty( $item->email) ? $item->email : $item->number.'@tmp.com';
-
-        $user_data = array(
-            'user_login'    => $item->number,
-            'user_pass'     => md5($item->number),
-            'display_name'  => $item->name,
-            'user_email'    => $item->email
-            );
+        if ( ! is_null($item->user_id) ) {
+            // update user
+            $user_data['ID'] = $item->user_id;
+            $user_data['user_email'] = validate_email_user($item->email, $item->user_id);
+        } else {
+            // insert user
+            $user_data['user_pass'] = md5($item->number);
+            $user_data['user_email'] = validate_email_user($item->email);
+        }
 
         $id_user = wp_insert_user($user_data);
 
@@ -80,9 +90,16 @@ class Process{
             error_log(print_r($id_user,true));
 
         } else {
-            error_log("El usuario con número {$item->number} No se creó correctamente");
+            error_log("Error al crear o actualizar el usuario con número {$item->number}");
             error_log($id_user->get_error_message());
+            return false;
         }
+
+        return $id_user;
+    }
+
+    // Update new user
+    private function update_user($item){
 
     }
 

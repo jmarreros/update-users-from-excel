@@ -39,7 +39,20 @@ function get_config_required_fields(){
 // Exit process
 function exit_process($process_ok = 1, $redirection){
     $cad = (strpos(DCMS_SUBMENU,'?')) ? "&" : '?';
-    if ( $redirection ) wp_redirect( admin_url( DCMS_SUBMENU . $cad . 'page=update-users-excel&process='.$process_ok) );
+    if ( $redirection ) wp_redirect( admin_url( DCMS_SUBMENU . $cad . 'page=update-users-excel&tab=advanced&process='.$process_ok) );
     exit();
+}
+
+// Validate email
+function validate_email_user($email, $user_id = -1){
+    if ( empty( $email) ){
+        return  uniqid().'@email_empty.com';
+    } else {
+        $id = email_exists($email);
+        if ( is_int($id) && $user_id != $id ) {
+            return uniqid().'@email_exists.com';
+        }
+    }
+    return $email;
 }
 

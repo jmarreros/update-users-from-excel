@@ -11,7 +11,7 @@ $plugin_tabs['advanced'] = "Advanced";
 $current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
 ?>
 
-<div class="wrap">
+<div class="wrap" style="background-color:#555">
 
 <h1><?php _e('Update Users from Excel', 'dcms-update-users-excel') ?></h1>
 
