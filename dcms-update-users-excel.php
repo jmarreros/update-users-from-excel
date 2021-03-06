@@ -20,6 +20,7 @@ use dcms\update\includes\Configuration;
 use dcms\update\includes\Readfile;
 use dcms\update\includes\Process;
 use dcms\update\includes\Cron;
+use dcms\update\includes\Profile;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -51,6 +52,7 @@ final class Loader{
 		include_once ( DCMS_UPDATE_PATH . '/includes/database.php');
 		include_once ( DCMS_UPDATE_PATH . '/includes/process.php');
 		include_once ( DCMS_UPDATE_PATH . '/includes/cron.php');
+		include_once ( DCMS_UPDATE_PATH . '/includes/profile.php');
 		include_once ( DCMS_UPDATE_PATH . '/libs/simplexlsx.php');
 	}
 
@@ -82,6 +84,7 @@ final class Loader{
 		new Configuration();
 		new Process();
 		new Cron();
+		new Profile();
 	}
 
 }

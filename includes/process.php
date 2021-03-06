@@ -76,6 +76,7 @@ class Process{
             $user_data['user_pass'] = md5($item->number);
             $user_data['user_email'] = validate_email_user($item->email);
         }
+        $item->email = $user_data['user_email']; // for user meta
 
         $id_user = wp_insert_user($user_data);
 
@@ -139,6 +140,8 @@ class Process{
             foreach ($headers_ids as $key => $value) {
                 if ( ! empty($item[$value]) ){
 
+                    // TODO
+                    // Comprobar fechas
                     if ( $key == 'birth' ){ // for dates
                         $time = strtotime($item[$value]);
                         $newformat = date('Y-m-d',$time);

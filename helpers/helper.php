@@ -46,11 +46,11 @@ function exit_process($process_ok = 1, $redirection){
 // Validate email
 function validate_email_user($email, $user_id = -1){
     if ( empty( $email) ){
-        return  uniqid().'@email_empty.com';
+        return  uniqid().'@emailempty.com';
     } else {
         $id = email_exists($email);
         if ( is_int($id) && $user_id != $id ) {
-            return uniqid().'@email_exists.com';
+            return uniqid().'@emailexists.com';
         }
     }
     return $email;
