@@ -24,9 +24,9 @@ class Plugin{
         $db->create_table();
 
         // // Create cron
-        // if( ! wp_next_scheduled( 'dcms_cron_hook' ) ) {
-        //     wp_schedule_event( current_time( 'timestamp' ), 'dcms_interval', 'dcms_cron_hook' );
-        // }
+        if( ! wp_next_scheduled( 'dcms_cron_hook' ) ) {
+            wp_schedule_event( current_time( 'timestamp' ), 'dcms_interval', 'dcms_cron_hook' );
+        }
 
     }
 
@@ -37,7 +37,7 @@ class Plugin{
 
         update_option('dcms_last_modified_file', 0);
 
-        // wp_clear_scheduled_hook( 'dcms_cron_hook' );
+        wp_clear_scheduled_hook( 'dcms_cron_hook' );
     }
 
 }

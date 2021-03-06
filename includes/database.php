@@ -32,10 +32,9 @@ class Database{
     // Select table for last modified date and not date_modified related with product id
     public function select_table_filter($limit = 0){
         // Tmp delete users
-        // for ($i=2; $i <=9; $i++) {
+        // for ($i=10; $i <=19; $i++) {
         //     wp_delete_user($i);
         // }
-
 
         $last_modified  = get_option('dcms_last_modified_file');
         $table_user     = $this->wpdb->prefix."users";

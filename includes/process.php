@@ -43,19 +43,12 @@ class Process{
 
     // Update products stock
     private function update_users($count){
-
         $table = new Database();
-
         $items = $table->select_table_filter($count);
 
-        // TODO
-        // - Obtener el user_id, si existe será actualización
-        // - Sino existe será un usuario nuevo
-
         foreach ($items as $item) {
-
             // Insert or update a user
-            $id_user = $this->insert_new_user( $item );
+            $id_user = $this->save_user( $item );
 
             if ( $id_user ){
                 $table->update_item_table($item->id);
@@ -67,9 +60,9 @@ class Process{
     }
 
     // Inserte new user
-    private function insert_new_user($item){
+    private function save_user($item){
         $user_data  = [];
-        $user_data['display_name'] = $item->name;
+        $user_data['display_name'] = $item->name.'-OK';
         $user_data['user_login'] = $item->number;
 
         if ( ! is_null($item->user_id) ) {
@@ -87,7 +80,7 @@ class Process{
         // Validate
         if ( ! is_wp_error( $id_user ) ) {
             // Add meta data
-            error_log(print_r($id_user,true));
+            $this->save_user_additional_fields($id_user, $item);
 
         } else {
             error_log("Error al crear o actualizar el usuario con número {$item->number}");
@@ -99,8 +92,12 @@ class Process{
     }
 
     // Update new user
-    private function update_user($item){
+    private function save_user_additional_fields($id_user, $item){
+        $fields = get_config_fields();
 
+        foreach ($fields as $key => $value) {
+            update_user_meta($id_user, $key, $item->{$key});
+        }
     }
 
 
@@ -159,40 +156,3 @@ class Process{
     }
 
 }
-
-
-
-// // Get the items to work with in batch process
-// $items = $table->select_table_filter($count);
-
-// error_log(Date("h:i:sa").' - Actualizaremos '. $count.' registros');
-
-// foreach ($items as $item) {
-
-//     // Get the product object
-//     $product = wc_get_product($item->post_id);
-
-//     // Validate only simple products
-//     if ( $product->get_type() == 'simple'){
-//         $price = $product->get_price();
-//         $stock = $product->get_stock_quantity();
-
-//         // If price has changed
-//         if ( ! is_null($item->price) && $price !== $item->price){
-//             $this->update_product_price($product, $item->price);
-//         }
-
-//         // If stock has changed
-//         if ( $stock !== $item->stock ){
-//             wc_update_product_stock($product, $item->stock);
-//         }
-
-//         // Update table log
-//         $table->update_item_table($item->id);
-
-//     } else {
-//         // Exclude item because is not simple product
-//         $table->exclude_item_table($item->id);
-//     }
-
-// }

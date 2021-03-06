@@ -37,8 +37,8 @@ final class Loader{
 		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
 		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
 		define ('DCMS_SUBMENU', 'tools.php');
-		define ('DCMS_COUNT_BATCH_PROCESS', 10); // Amount of registers to update every time
-		define ('DCMS_INTERVAL_SECONDS', 900); // For cron taks
+		define ('DCMS_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
+		define ('DCMS_INTERVAL_SECONDS', 5); // For cron taks
 	}
 
 	// Load all the files we need
