@@ -33,7 +33,7 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
         color:white;
     }
 
-    table.dcms-table tr td:nth-child(2){
+    table.dcms-table tr td:nth-child(4){
         font-weight:bold;
     }
 
@@ -64,37 +64,35 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 -
 <strong><?php echo __('Last modified Excel file process: ', 'dcms-update-users-excel') . date('d/m/Y - H:m:s', $last_modified_file) ?></strong>
 </section>
-<table class="dcms-table">
 
 <?php
-// TODO
-exit();
+    $fields = get_config_fields();
 ?>
 
-<?php foreach ($rows as $key => $item):  ?>
-    <tr class="<?= $item->updated?'updated':'' ?>" >
-    <?php if ( $key == 0 ): ?>
+<table class="dcms-table">
+    <tr>
         <th>#</th>
-        <th>SKU</th>
-        <th>Product</th>
-        <th>Stock</th>
-        <th>Price</th>
-        <th>State</th>
-        <th class="internal">Updated</th>
-        <th class="internal">Date updated</th>
+        <?php
+        $i = 0;
+        foreach($fields as $key => $field) {
+            if ( $i<6 ) echo "<th>" . $field . "</th>";
+            $i++;
+        }
+        ?>
+        <th class="internal">Update</th>
         <th class="internal">Excluded</th>
-    <?php else: ?>
-        <td><?= $key; ?></td>
-        <td><?= $item->sku ?></td>
-        <td><?= $item->product ?></td>
-        <td><?= $item->stock ?></td>
-        <td><?= $item->price ?></td>
-        <td><?= $item->state ?></td>
-        <td class="divider"><?= $item->updated?'yes':'no' ?></td>
-        <td><?= $item->date_update?date('d/m/Y - H:m:s', strtotime($item->date_update)):'' ?></td>
-        <td><?= $item->excluded?'yes':'no' ?></td>
-    <?php endif; ?>
+    </tr>
+<?php foreach ($rows as $key => $items):  ?>
+    <tr <?php if ( ! is_null($items->date_update) ) echo "class='updated'"?>>
+    <?php
+        $i = 0;
+        foreach($items as $key => $item) {
+            if ( $i<=6 ) echo "<td>" . $item . "</td>";
+            $i++;
+        }
+        ?>
+        <td class="divider"><?= $items->date_update ?></td>
+        <td><?= $items->excluded ?></td>
     </tr>
 <?php endforeach; ?>
 </table>
-

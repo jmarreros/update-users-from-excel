@@ -62,8 +62,10 @@ class Process{
     // Inserte new user
     private function save_user($item){
         $user_data  = [];
-        $user_data['display_name'] = $item->name.'-OK';
-        $user_data['user_login'] = $item->number;
+        $user_data['display_name']  = $item->name;
+        $user_data['user_login']    = $item->number;
+        $user_data['first_name']    = $item->name;
+        $user_data['last_name']     = $item->first_lastname . ' ' . $item->second_lastname;
 
         if ( ! is_null($item->user_id) ) {
             // update user

@@ -29,7 +29,7 @@ class Cron{
 
         if ( $cron_enabled ){
             $this->process->process_update();
+            error_log('Mi evento se ejecutó: '.Date("h:i:sa"));
         }
-        error_log('Mi evento se ejecutó: '.Date("h:i:sa"));
     }
 }
