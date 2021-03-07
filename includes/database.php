@@ -43,6 +43,8 @@ class Database{
                 LEFT JOIN {$table_user} u ON uu.number = u.user_login
                 WHERE uu.date_file = {$last_modified} AND uu.date_update IS NULL AND uu.excluded = 0";
 
+error_log(print_r($sql,true));
+
         if ( $limit > 0 ) $sql .= " LIMIT {$limit}";
 
         return $this->wpdb->get_results($sql);
@@ -76,7 +78,7 @@ class Database{
                     `name` varchar(150) DEFAULT NULL,
                     `first_lastname` varchar(150) DEFAULT NULL,
                     `second_lastname` varchar(150) DEFAULT NULL,
-                    `birth` datetime DEFAULT NULL,
+                    `birth` varchar(50) DEFAULT NULL,
                     `sub_type` varchar(150) DEFAULT NULL,
                     `address` varchar(250) DEFAULT NULL,
                     `postal_code` varchar(50) DEFAULT NULL,

@@ -139,17 +139,7 @@ class Process{
 
             foreach ($headers_ids as $key => $value) {
                 if ( ! empty($item[$value]) ){
-
-                    // TODO
-                    // Comprobar fechas
-                    if ( $key == 'birth' ){ // for dates
-                        $time = strtotime($item[$value]);
-                        $newformat = date('Y-m-d',$time);
-                        $row[$key] = $newformat;
-                    } else {
-                        $row[$key] = $item[$value];
-                    }
-
+                    $row[$key] = $item[$value];
                 }
             }
 
