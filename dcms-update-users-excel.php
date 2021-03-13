@@ -3,7 +3,7 @@
 Plugin Name: Update users Excel
 Plugin URI: https://decodecms.com
 Description: Update users from an excel file
-Version: 1.0
+Version: 1.1
 Author: Jhon Marreros Guzmán
 Author URI: https://decodecms.com
 Text Domain: dcms-update-users-excel
@@ -33,11 +33,11 @@ final class Loader{
 
 	// Define all the constants we need
 	public function define_constants(){
-		define ('DCMS_UPDATE_VERSION', '1.0');
+		define ('DCMS_UPDATE_VERSION', '1.1');
 		define ('DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ));
 		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
 		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
-		define ('DCMS_SUBMENU', 'tools.php');
+		define ('DCMS_SUBMENU', 'edit.php?post_type=events_sporting');
 		define ('DCMS_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
 		define ('DCMS_INTERVAL_SECONDS', 60); // For cron taks
 	}
@@ -67,8 +67,9 @@ final class Loader{
 	// Add link to plugin list
 	public function add_link_plugin(){
 		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( $links ){
+			$cad = (strpos(DCMS_SUBMENU,'?')) ? "&" : '?';
 			return array_merge( array(
-				'<a href="' . esc_url( admin_url( DCMS_SUBMENU . '&page=update-users-excel' ) ) . '">' . __( 'Settings', 'dcms-update-users-excel' ) . '</a>'
+				'<a href="' . esc_url( admin_url( DCMS_SUBMENU . $cad . 'page=update-users-excel' ) ) . '">' . __( 'Settings', 'dcms-update-users-excel' ) . '</a>'
 			), $links );
 		} );
 	}

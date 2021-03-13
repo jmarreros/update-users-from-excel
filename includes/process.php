@@ -73,7 +73,7 @@ class Process{
             $user_data['user_email'] = validate_email_user($item->email, $item->user_id);
         } else {
             // insert user
-            $user_data['user_pass'] = md5($item->number);
+            $user_data['user_pass'] = $item->pin;
             $user_data['user_email'] = validate_email_user($item->email);
         }
         $item->email = $user_data['user_email']; // for user meta

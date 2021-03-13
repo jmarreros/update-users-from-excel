@@ -4,8 +4,8 @@
 function get_config_fields(){
     return [
         'identify'  => 'Identify',
-        'pin'       => 'PIN',
-        'number'    => 'Number',
+        'pin'       => 'PIN', // Password Column
+        'number'    => 'Number', // Login column
         'reference' => 'Reference',
         'nif'       => 'NIF',
         'name'      => 'Name',
