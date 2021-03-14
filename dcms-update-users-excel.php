@@ -37,9 +37,9 @@ final class Loader{
 		define ('DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ));
 		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
 		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
-		define ('DCMS_SUBMENU', 'edit.php?post_type=events_sporting');
-		define ('DCMS_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
-		define ('DCMS_INTERVAL_SECONDS', 60); // For cron taks
+		define ('DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting');
+		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
+		define ('DCMS_UPDATE_INTERVAL_SECONDS', 60); // For cron taks
 	}
 
 	// Load all the files we need
@@ -67,9 +67,9 @@ final class Loader{
 	// Add link to plugin list
 	public function add_link_plugin(){
 		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( $links ){
-			$cad = (strpos(DCMS_SUBMENU,'?')) ? "&" : '?';
+			$cad = (strpos(DCMS_UPDATE_SUBMENU,'?')) ? "&" : '?';
 			return array_merge( array(
-				'<a href="' . esc_url( admin_url( DCMS_SUBMENU . $cad . 'page=update-users-excel' ) ) . '">' . __( 'Settings', 'dcms-update-users-excel' ) . '</a>'
+				'<a href="' . esc_url( admin_url( DCMS_UPDATE_SUBMENU . $cad . 'page=update-users-excel' ) ) . '">' . __( 'Settings', 'dcms-update-users-excel' ) . '</a>'
 			), $links );
 		} );
 	}

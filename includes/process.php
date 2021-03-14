@@ -35,7 +35,7 @@ class Process{
         }
 
         // update users in batch process
-        $this->update_users(DCMS_COUNT_BATCH_PROCESS);
+        $this->update_users(DCMS_UPDATE_COUNT_BATCH_PROCESS);
 
         exit_process(1, $redirection);
 

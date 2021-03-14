@@ -14,7 +14,7 @@ class Submenu{
     // Register submenu
     public function register_submenu(){
         add_submenu_page(
-            DCMS_SUBMENU,
+            DCMS_UPDATE_SUBMENU,
             __('Update Users Excel','dcms-update-users-excel'),
             __('Update Users Excel','dcms-update-users-excel'),
             'manage_options',

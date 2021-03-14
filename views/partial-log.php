@@ -33,6 +33,7 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
         color:white;
     }
 
+    table.dcms-table tr td:nth-child(3),
     table.dcms-table tr td:nth-child(4){
         font-weight:bold;
     }
@@ -57,8 +58,8 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 </style>
 
 <section class="msg-top">
-<span><?php echo DCMS_COUNT_BATCH_PROCESS . __(' Items', 'dcms-update-users-excel') ?></span>
-<span><?php echo __('every ', 'dcms-update-users-excel') . DCMS_INTERVAL_SECONDS . "s" ?></span>
+<span><?php echo DCMS_UPDATE_COUNT_BATCH_PROCESS . __(' Items', 'dcms-update-users-excel') ?></span>
+<span><?php echo __('every ', 'dcms-update-users-excel') . DCMS_UPDATE_INTERVAL_SECONDS . "s" ?></span>
 -
 <strong><?php echo __('Pending items: ', 'dcms-update-users-excel') . count($pending) ?></strong>
 -

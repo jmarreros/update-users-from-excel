@@ -16,8 +16,8 @@ class Cron{
     // Add new schedule
     public function dcms_custom_schedule( $schedules ) {
         $schedules['dcms_interval'] = array(
-            'interval' => DCMS_INTERVAL_SECONDS,
-            'display' => DCMS_INTERVAL_SECONDS. ' seconds'
+            'interval' => DCMS_UPDATE_INTERVAL_SECONDS,
+            'display' => DCMS_UPDATE_INTERVAL_SECONDS. ' seconds'
         );
         return $schedules;
     }
