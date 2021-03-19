@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Update users Excel
+Plugin Name: Sporting update users Excel
 Plugin URI: https://decodecms.com
 Description: Update users from an excel file
 Version: 1.1
@@ -13,6 +13,8 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 */
 
 namespace dcms\update;
+
+require __DIR__ . '/vendor/autoload.php';
 
 use dcms\update\includes\Plugin;
 use dcms\update\includes\Submenu;
@@ -33,27 +35,13 @@ final class Loader{
 
 	// Define all the constants we need
 	public function define_constants(){
-		define ('DCMS_UPDATE_VERSION', '1.1');
+		define ('DCMS_UPDATE_VERSION', '1.2');
 		define ('DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ));
 		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
 		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
 		define ('DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting');
 		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
-		define ('DCMS_UPDATE_INTERVAL_SECONDS', 60); // For cron taks
-	}
-
-	// Load all the files we need
-	public function load_includes(){
-		include_once ( DCMS_UPDATE_PATH . '/helpers/helper.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/plugin.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/submenu.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/configuration.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/readfile.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/database.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/process.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/cron.php');
-		include_once ( DCMS_UPDATE_PATH . '/includes/profile.php');
-		include_once ( DCMS_UPDATE_PATH . '/libs/simplexlsx.php');
+		define ('DCMS_UPDATE_INTERVAL_SECONDS', 5); // For cron taks
 	}
 
 	// Load tex domain
@@ -77,7 +65,6 @@ final class Loader{
 	// Initialize all
 	public function init(){
 		$this->define_constants();
-		$this->load_includes();
 		$this->load_domain();
 		$this->add_link_plugin();
 		new Plugin();

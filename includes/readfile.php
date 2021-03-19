@@ -1,10 +1,9 @@
 <?php
 
-
 namespace dcms\update\includes;
 
 use dcms\update\libs\SimpleXLSX;
-
+use dcms\update\helpers\Helper;
 
 class Readfile{
 
@@ -55,7 +54,7 @@ class Readfile{
     // Get ids by column name in an array, column -1 if not exits
     public function get_headers_ids(){
 
-        $config_fields = get_config_fields();
+        $config_fields = Helper::get_config_fields();
         $headers = $this->get_header($this->sheet_number);
         $options = get_option( 'dcms_user_excel_options' );
         $headers_id     = [];

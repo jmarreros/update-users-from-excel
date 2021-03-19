@@ -1,0 +1,14 @@
+{
+    "name": "webservi/dcms-update-users-excel",
+    "description": "Import users from excel",
+    "authors": [
+        {
+            "name": "Jhon Marreros Guzman",
+            "email": "j_marreros@hotmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"dcms\\update\\": "./"}
+    },
+    "require": {}
+}

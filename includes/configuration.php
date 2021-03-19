@@ -2,6 +2,8 @@
 
 namespace dcms\update\includes;
 
+use dcms\update\helpers\Helper;
+
 class Configuration{
 
     public function __construct(){
@@ -46,7 +48,7 @@ class Configuration{
                                 'required' => true]
         );
 
-        $config_fields = get_config_fields();
+        $config_fields = Helper::get_config_fields();
 
         foreach ($config_fields as $key => $value) {
             $field_name = "dcms_usexcel_${key}_field";
@@ -155,7 +157,7 @@ class Configuration{
         $sheet_number = $output['dcms_usexcel_sheet_field'];
 
         $columns = [];
-        $config_fields = get_config_fields();
+        $config_fields = Helper::get_config_fields();
 
         foreach ($config_fields as $key => $value) {
             $name = "dcms_usexcel_${key}_field";

@@ -1,3 +1,7 @@
+<?php
+use dcms\update\helpers\Helper;
+?>
+
 <br><hr><br>
 
 <style>
@@ -12,7 +16,7 @@
 
 
         <?php
-            $fields = get_config_fields();
+            $fields = Helper::get_config_fields();
 
             foreach ($fields as $key => $value) {
             ?>

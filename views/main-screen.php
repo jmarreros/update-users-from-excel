@@ -3,12 +3,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 if ( ! current_user_can( 'manage_options' ) ) return; // only administrator
 
 $plugin_tabs = [];
-$plugin_tabs['general'] = "General";
 $plugin_tabs['settings'] = "Settings";
+$plugin_tabs['log'] = "Log";
 $plugin_tabs['advanced'] = "Advanced";
 
 // Get Current tab
-$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
+$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'settings';
 ?>
 
 <div class="wrap">
@@ -19,8 +19,8 @@ $current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'general';
 plugin_options_tabs($current_tab, $plugin_tabs);
 
 switch ($current_tab){
-    case 'general':
-        tab_general();
+    case 'log':
+        tab_log();
         break;
     case 'settings':
         tab_settings();
@@ -37,7 +37,7 @@ switch ($current_tab){
 <?php
 // - Tab General
 
-function tab_general(){
+function tab_log(){
     ?>
     <h2><?php _e('Log Update', 'dcms-update-users-excel') ?></h2>
     <?php

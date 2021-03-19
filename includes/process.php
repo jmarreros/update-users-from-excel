@@ -4,6 +4,7 @@ namespace dcms\update\includes;
 
 use dcms\update\includes\Database;
 use dcms\update\includes\Readfile;
+use dcms\update\helpers\Helper;
 
 class Process{
     public function __construct(){
@@ -21,7 +22,7 @@ class Process{
 
         // Validation
         if ( ! $file->file_exists() ) {
-            exit_process(0, $redirection);
+            Helper::exit_process(0, $redirection);
             error_log('Excel File does not exists');
         }
 
@@ -37,7 +38,7 @@ class Process{
         // update users in batch process
         $this->update_users(DCMS_UPDATE_COUNT_BATCH_PROCESS);
 
-        exit_process(1, $redirection);
+        Helper::exit_process(1, $redirection);
 
     }
 
@@ -70,11 +71,11 @@ class Process{
         if ( ! is_null($item->user_id) ) {
             // update user
             $user_data['ID'] = $item->user_id;
-            $user_data['user_email'] = validate_email_user($item->email, $item->user_id);
+            $user_data['user_email'] = Helper::validate_email_user($item->email, $item->user_id);
         } else {
             // insert user
             $user_data['user_pass'] = $item->pin;
-            $user_data['user_email'] = validate_email_user($item->email);
+            $user_data['user_email'] = Helper::validate_email_user($item->email);
         }
         $item->email = $user_data['user_email']; // for user meta
 
@@ -96,7 +97,7 @@ class Process{
 
     // Update new user
     private function save_user_additional_fields($id_user, $item){
-        $fields = get_config_fields();
+        $fields = Helper::get_config_fields();
 
         foreach ($fields as $key => $value) {
             update_user_meta($id_user, $key, $item->{$key});
@@ -116,7 +117,7 @@ class Process{
         };
 
         $headers_ids = $file->get_headers_ids();
-        $config_required_fields = get_config_required_fields();
+        $config_required_fields = Helper::get_config_required_fields();
 
         // Validation required fields
         foreach ($config_required_fields as $key => $value) {

@@ -1,6 +1,7 @@
 <?php
 
 use dcms\update\includes\Database;
+use dcms\update\helpers\Helper;
 
 $db = new Database();
 $rows = $db->select_table();
@@ -67,7 +68,7 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 </section>
 
 <?php
-    $fields = get_config_fields();
+    $fields = Helper::get_config_fields();
 ?>
 
 <table class="dcms-table">
