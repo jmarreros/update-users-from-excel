@@ -9,6 +9,5 @@
     ],
     "autoload": {
         "psr-4": {"dcms\\update\\": "./"}
-    },
-    "require": {}
+    }
 }
