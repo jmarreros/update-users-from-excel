@@ -1,6 +1,8 @@
 <?php
 namespace dcms\update\includes;
 
+use dcms\update\helpers\Helper;
+
 class Profile{
 
     public function __construct(){
@@ -25,7 +27,7 @@ class Profile{
         }
 
         // Save everyfield
-        $fields = get_config_fields();
+        $fields = Helper::get_config_fields();
         foreach ($fields as $key => $value) {
             if ( isset($_POST[$key]) ){
                 $field = sanitize_text_field( $_POST[$key] );

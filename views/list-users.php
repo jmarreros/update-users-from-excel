@@ -34,8 +34,8 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
         color:white;
     }
 
-    table.dcms-table tr td:nth-child(2),
-    table.dcms-table tr td:nth-child(3){
+    table.dcms-table tr td:nth-child(1),
+    table.dcms-table tr td:nth-child(2){
         font-weight:bold;
     }
 
@@ -71,7 +71,6 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 
 <table class="dcms-table">
     <tr>
-        <th>#</th>
         <?php
         $i = 0;
         foreach($fields as $key => $field) {
@@ -86,10 +85,12 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 <?php foreach ($rows as $key => $items):  ?>
     <tr>
     <?php
-        $i = 0;
+        $i = 1;
         foreach($items as $key => $item) {
-            if ( $i<=6 ) echo "<td>" . $item . "</td>";
-            $i++;
+            if ( $key != 'id'){
+                if ( $i<=6 ) echo "<td>" . $item . "</td>";
+                $i++;
+            }
         }
         ?>
         <td><?= strtolower($items->email) ?></td>

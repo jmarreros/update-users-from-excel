@@ -42,6 +42,8 @@ final class Loader{
 		define ('DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting');
 		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 4); // Amount of registers to update every time
 		define ('DCMS_UPDATE_INTERVAL_SECONDS', 5); // For cron taks
+
+		if ( ! defined( 'DCMS_PIN_SENT' ) ) define ('DCMS_PIN_SENT', 'dcms-pin-sent');
 	}
 
 	// Load tex domain

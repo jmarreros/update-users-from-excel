@@ -49,11 +49,8 @@ class Process{
 
         foreach ($items as $item) {
 
-            // Validate if the user has changed his email
-            $update_email = ! is_null($item->user_id) && ! $db->user_pint_sent();
-
             // Insert or update a user
-            $id_user = $this->save_user( $item , $update_email);
+            $id_user = $this->save_user( $item);
 
             // Update log table
             if ( $id_user ){
@@ -66,34 +63,44 @@ class Process{
     }
 
     // Inserte new user
-    private function save_user($item, $update_email){
+    private function save_user($item){
+
+        // general data wp_users
         $user_data  = [];
         $user_data['display_name']  = $item->name;
         $user_data['user_login']    = $item->identify;
         $user_data['first_name']    = $item->name;
         $user_data['last_name']     = $item->first_lastname . ' ' . $item->second_lastname;
 
-        if ( ! is_null($item->user_id) ) {
-            // update user
-            $user_data['ID'] = $item->user_id;
+        $id_user = $item->user_id;
 
-            // Only update if the user doesn't change his email
-            if ( $update_email ){
+        if ( ! is_null($id_user) ) {
+            // update wp_users
+            $user_data['ID'] = $id_user;
+
+            // Only update if the user doesn't sent pin
+            $pin_sent = get_user_meta($item->user_id, DCMS_PIN_SENT, true);
+            if ( ! $pin_sent ){
                 $user_data['user_email'] = Helper::validate_email_user($item->email, $item->user_id);
             }
 
+            $item->email = ! $pin_sent ? $user_data['user_email']: NULL; // update item email for user meta
+
+            $id_user = wp_update_user($user_data);
+
         } else {
-            // insert user
+            // insert wp_users
             $user_data['user_pass'] = $item->pin;
             $user_data['user_email'] = Helper::validate_email_user($item->email);
-        }
-        $item->email = $user_data['user_email']; // for user meta
+            $item->email = $user_data['user_email']; // update item email for user meta
 
-        $id_user = wp_insert_user($user_data);
+            $id_user = wp_insert_user($user_data);
+        }
 
         // Validate
         if ( ! is_wp_error( $id_user ) ) {
-            // Add meta data
+
+            // Add user meta data wp_usermeta
             $this->save_user_additional_fields($id_user, $item);
 
         } else {
@@ -110,7 +117,9 @@ class Process{
         $fields = Helper::get_config_fields();
 
         foreach ($fields as $key => $value) {
-            update_user_meta($id_user, $key, $item->{$key});
+            if ( ! is_null( $item->{$key}) ){ // Validate for a value for updating
+                update_user_meta($id_user, $key, $item->{$key});
+            }
         }
     }
 

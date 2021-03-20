@@ -32,7 +32,6 @@ class Database{
         $last_modified = get_option('dcms_last_modified_file', NULL);
 
         $sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NULL AND excluded = 0";
-        error_log(print_r($sql,true));
         return $this->wpdb->get_var($sql);
     }
 
@@ -116,15 +115,4 @@ class Database{
         $this->wpdb->query($sql);
     }
 
-
-    // Validate if email's users can be imported, if the user has changed his pasword, we don't update the email
-    public function user_pint_sent($id_user){
-        $table = $this->wpdb->prefi.'dcms_pin_sent';
-        $sql = "SELECT id_user FROM {$table} WHERE id_user = {$id_user} LIMIT 1";
-
-        return boolval($this->wpdb->get_var($sql));
-    }
 }
-
-
-// CREATE TABLE IF NOT EXISTS
