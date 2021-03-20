@@ -9,6 +9,7 @@ use dcms\update\helpers\Helper;
 class Process{
     public function __construct(){
         add_action( 'admin_post_process_form', [$this, 'process_force_update'] );
+        add_action( 'admin_post_reset_log', [$this, 'process_reset_log'] );
     }
 
     // Manual process update - with redirection
@@ -167,6 +168,15 @@ class Process{
 
             $db->insert_data($row);
         }
+    }
+
+    // Reset process
+    public function process_reset_log(){
+        $db = new Database();
+        $db->truncate_table();
+
+        update_option('dcms_last_modified_file', 0); // update wp_option
+        Helper::exit_process(1, true);
     }
 
 
