@@ -2,6 +2,7 @@
 
 namespace dcms\update\includes;
 
+use dcms\update\helpers\Helper;
 use dcms\update\libs\SimpleXLSX;
 
 class Readfile{

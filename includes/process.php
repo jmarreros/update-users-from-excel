@@ -44,34 +44,44 @@ class Process{
 
     // Update products stock
     private function update_users($count){
-        $table = new Database();
-        $items = $table->select_table_filter($count);
+        $db = new Database();
+        $items = $db->select_table_filter($count);
 
         foreach ($items as $item) {
-            // Insert or update a user
-            $id_user = $this->save_user( $item );
 
+            // Validate if the user has changed his email
+            $update_email = ! is_null($item->user_id) && ! $db->user_pint_sent();
+
+            // Insert or update a user
+            $id_user = $this->save_user( $item , $update_email);
+
+            // Update log table
             if ( $id_user ){
-                $table->update_item_table($item->id);
+                $db->update_item_table($item->id);
             } else{
-                $table->exclude_item_table($item->id);
+                $db->exclude_item_table($item->id);
             }
 
         }
     }
 
     // Inserte new user
-    private function save_user($item){
+    private function save_user($item, $update_email){
         $user_data  = [];
         $user_data['display_name']  = $item->name;
-        $user_data['user_login']    = $item->number;
+        $user_data['user_login']    = $item->identify;
         $user_data['first_name']    = $item->name;
         $user_data['last_name']     = $item->first_lastname . ' ' . $item->second_lastname;
 
         if ( ! is_null($item->user_id) ) {
             // update user
             $user_data['ID'] = $item->user_id;
-            $user_data['user_email'] = Helper::validate_email_user($item->email, $item->user_id);
+
+            // Only update if the user doesn't change his email
+            if ( $update_email ){
+                $user_data['user_email'] = Helper::validate_email_user($item->email, $item->user_id);
+            }
+
         } else {
             // insert user
             $user_data['user_pass'] = $item->pin;
@@ -128,10 +138,10 @@ class Process{
         }
 
         // Data base
-        $table = new Database();
+        $db = new Database();
 
         // Clear data
-        $table->truncate_table();
+        $db->truncate_table();
 
         foreach ($data as $key => $item) {
             if ( $key == 0 ) continue; // Exclude first line
@@ -146,9 +156,9 @@ class Process{
 
             $row['date_file'] =  $last_modified;
 
-            $table->insert_data($row);
+            $db->insert_data($row);
         }
-
     }
+
 
 }

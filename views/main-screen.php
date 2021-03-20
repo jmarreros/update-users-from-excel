@@ -3,17 +3,17 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 if ( ! current_user_can( 'manage_options' ) ) return; // only administrator
 
 $plugin_tabs = [];
-$plugin_tabs['settings'] = "Settings";
 $plugin_tabs['log'] = "Log";
+$plugin_tabs['settings'] = "Settings";
 $plugin_tabs['advanced'] = "Advanced";
 
 // Get Current tab
-$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'settings';
+$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'log';
 ?>
 
 <div class="wrap">
 
-<h1><?php _e('Update Users from Excel', 'dcms-update-users-excel') ?></h1>
+<h1><?php _e('Users List', 'dcms-update-users-excel') ?></h1>
 
 <?php
 plugin_options_tabs($current_tab, $plugin_tabs);
@@ -38,10 +38,7 @@ switch ($current_tab){
 // - Tab General
 
 function tab_log(){
-    ?>
-    <h2><?php _e('Log Update', 'dcms-update-users-excel') ?></h2>
-    <?php
-    include_once('partial-log.php');
+    include_once('list-users.php');
 }
 
 // - Tab Settings

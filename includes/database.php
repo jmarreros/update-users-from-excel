@@ -19,31 +19,34 @@ class Database{
     }
 
     // Read table with current lastmodified date file
-    public function select_table( $last_modified = false ){
+    public function select_table_resume( $limit = 100 ){
+        $last_modified = get_option('dcms_last_modified_file', NULL);
 
-        if ( ! $last_modified ){
-            $last_modified = get_option('dcms_last_modified_file');
-        }
-
-        $sql = "SELECT * FROM {$this->table_name} WHERE date_file = {$last_modified}";
+        $sql = "SELECT * FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NOT NULL ORDER BY ID DESC LIMIT {$limit}";
         return $this->wpdb->get_results($sql);
     }
 
+
+    // Count pending items to import
+    public function count_pending_imported(){
+        $last_modified = get_option('dcms_last_modified_file', NULL);
+
+        $sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NULL AND excluded = 0";
+        error_log(print_r($sql,true));
+        return $this->wpdb->get_var($sql);
+    }
+
+
     // Select table for last modified date and not date_modified related with product id
     public function select_table_filter($limit = 0){
-        // Tmp delete users
-        // for ($i=10; $i <=19; $i++) {
-        //     wp_delete_user($i);
-        // }
 
         $last_modified  = get_option('dcms_last_modified_file');
         $table_user     = $this->wpdb->prefix."users";
 
         $sql = "SELECT *, u.id user_id FROM {$this->table_name} uu
-                LEFT JOIN {$table_user} u ON uu.number = u.user_login
+                LEFT JOIN {$table_user} u ON uu.identify = u.user_login
                 WHERE uu.date_file = {$last_modified} AND uu.date_update IS NULL AND uu.excluded = 0";
 
-error_log(print_r($sql,true));
 
         if ( $limit > 0 ) $sql .= " LIMIT {$limit}";
 
@@ -111,6 +114,15 @@ error_log(print_r($sql,true));
     public function drop_table(){
         $sql = "DROP TABLE IF EXISTS {$this->table_name};";
         $this->wpdb->query($sql);
+    }
+
+
+    // Validate if email's users can be imported, if the user has changed his pasword, we don't update the email
+    public function user_pint_sent($id_user){
+        $table = $this->wpdb->prefi.'dcms_pin_sent';
+        $sql = "SELECT id_user FROM {$table} WHERE id_user = {$id_user} LIMIT 1";
+
+        return boolval($this->wpdb->get_var($sql));
     }
 }
 

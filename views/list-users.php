@@ -4,8 +4,8 @@ use dcms\update\includes\Database;
 use dcms\update\helpers\Helper;
 
 $db = new Database();
-$rows = $db->select_table();
-$pending = $db->select_table_filter();
+$rows = $db->select_table_resume(DCMS_UPDATE_COUNT_BATCH_PROCESS);
+$pending = $db->count_pending_imported();
 $last_modified_file = get_option('dcms_last_modified_file',0);
 ?>
 <style>
@@ -34,13 +34,9 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
         color:white;
     }
 
-    table.dcms-table tr td:nth-child(3),
-    table.dcms-table tr td:nth-child(4){
+    table.dcms-table tr td:nth-child(2),
+    table.dcms-table tr td:nth-child(3){
         font-weight:bold;
-    }
-
-    table tr.updated{
-        background-color:#F4FFED;
     }
 
     section.msg-top{
@@ -58,11 +54,13 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 
 </style>
 
+<h2><?php _e('Latest imported', 'dcms-update-users-excel') ?></h2>
+
 <section class="msg-top">
 <span><?php echo DCMS_UPDATE_COUNT_BATCH_PROCESS . __(' Items', 'dcms-update-users-excel') ?></span>
 <span><?php echo __('every ', 'dcms-update-users-excel') . DCMS_UPDATE_INTERVAL_SECONDS . "s" ?></span>
 -
-<strong><?php echo __('Pending items: ', 'dcms-update-users-excel') . count($pending) ?></strong>
+<strong><?php echo __('Pending items: ', 'dcms-update-users-excel') . $pending ?></strong>
 -
 <strong><?php echo __('Last modified Excel file process: ', 'dcms-update-users-excel') . date('d/m/Y - H:m:s', $last_modified_file) ?></strong>
 </section>
@@ -81,11 +79,12 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
             $i++;
         }
         ?>
+        <th>Email</th>
         <th class="internal">Update</th>
         <th class="internal">Excluded</th>
     </tr>
 <?php foreach ($rows as $key => $items):  ?>
-    <tr <?php if ( ! is_null($items->date_update) ) echo "class='updated'"?>>
+    <tr>
     <?php
         $i = 0;
         foreach($items as $key => $item) {
@@ -93,6 +92,7 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
             $i++;
         }
         ?>
+        <td><?= strtolower($items->email) ?></td>
         <td class="divider"><?= $items->date_update ?></td>
         <td><?= $items->excluded ?></td>
     </tr>
