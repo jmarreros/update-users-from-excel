@@ -20,34 +20,40 @@ class Export{
         // Create Excel file
         $spreadsheet = new Spreadsheet();
         $writer = new Xlsx($spreadsheet);
-
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Headers
+        // Headers excel
         $fields = Helper::get_config_fields();
-
-        $i = 1;
+        $icol = 1;
         foreach ($fields as $key => $value) {
-            $sheet->setCellValueByColumnAndRow($i, 1, $value);
-            $i++;
+            $sheet->setCellValueByColumnAndRow($icol, 1, $value);
+            $icol++;
         }
-
         $styleArray = Helper::get_style_header_cells();
         $sheet->getStyle('A1:T1')->applyFromArray($styleArray);
 
+        // Get all the users
+        $db = new Database();
+        $users= get_users(['role__not_in' => 'Administrator']);
 
-        // foreach ($users as $user) {
-        //     $user_meta = $db->get_custom_meta_user($user->ID);
+        // Fill excel body
+        $irow = 2;
+        foreach ($users as $user) {
+            $icol = 1;
+            $user_meta = $db->get_custom_meta_user($user->ID);
 
-        //     // if (isset( $user_meta['identify']->meta_value)){
-        //     //     error_log(print_r('Establecido',true));
-        //     // }
-        //     $tmp = $user_meta['pin']->meta_value;
-        //     error_log(print_r($tmp,true));
+            foreach ($fields as $key => $value) {
+                if ( isset($user_meta[$key]) ){
+                    $content = $user_meta[$key]->meta_value;
+                    $sheet->setCellValueByColumnAndRow($icol, $irow, $content);
+                }
+                $icol++;
+            }
 
-        // }
+            $irow++;
+        }
 
-
+        // Send excel
         $filename = 'list_users.xlsx';
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename='. $filename);
@@ -55,60 +61,5 @@ class Export{
         $writer->save('php://output');
 
         wp_die();
-
-        // Get all the users
-        // $db = new Database();
-        // $users= get_users(['role__not_in' => 'Administrator']);
-
-
-        // foreach ($users as $user) {
-        //     $user_meta = $db->get_custom_meta_user($user->ID);
-
-        //     // if (isset( $user_meta['identify']->meta_value)){
-        //     //     error_log(print_r('Establecido',true));
-        //     // }
-        //     $tmp = $user_meta['pin']->meta_value;
-        //     error_log(print_r($tmp,true));
-
-        // }
-
-        // wp_redirect( admin_url(DCMS_UPDATE_SUBMENU).'&page=update-users-excel');
-        // wp_die();
     }
-
-    //     $db = new Database();
-
-    //     $spreadsheet = new Spreadsheet();
-    //     $writer = new Xlsx($spreadsheet);
-
-    //     $sheet = $spreadsheet->getActiveSheet();
-
-    //     // Headers
-    //     $sheet->setCellValue('A1', 'Identificador');
-    //     $sheet->setCellValue('B1', 'PIN');
-    //     $sheet->setCellValue('C1', 'Correo');
-    //     $sheet->setCellValue('D1', 'Fecha');
-
-    //     // Get data from table
-    //     $data = $db->select_log_table(0, 'ASC');
-
-    //     $i = 2;
-    //     foreach ($data as $row) {
-    //         $sheet->setCellValue('A'.$i, $row->identify);
-    //         $sheet->setCellValue('B'.$i, $row->pin);
-    //         $sheet->setCellValue('C'.$i, $row->email);
-    //         $sheet->setCellValue('D'.$i, $row->date);
-    //         $i++;
-    //     }
-
-    //     $filename = 'pin_sent.xlsx';
-
-    //     header('Content-Type: application/vnd.ms-excel');
-    //     header('Content-Disposition: attachment;filename='. $filename);
-    //     header('Cache-Control: max-age=0');
-    //     $writer->save('php://output');
-
-    //     wp_redirect( admin_url(DCMS_PIN_SUBMENU).'&page=send-pin');
-    //     wp_die();
-
 }
