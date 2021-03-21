@@ -9,5 +9,8 @@
     ],
     "autoload": {
         "psr-4": {"dcms\\update\\": "./"}
+    },
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.17"
     }
 }

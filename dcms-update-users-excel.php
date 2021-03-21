@@ -23,6 +23,7 @@ use dcms\update\includes\Readfile;
 use dcms\update\includes\Process;
 use dcms\update\includes\Cron;
 use dcms\update\includes\Profile;
+use dcms\update\includes\Export;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -75,6 +76,7 @@ final class Loader{
 		new Process();
 		new Cron();
 		new Profile();
+		new Export();
 	}
 
 }

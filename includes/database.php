@@ -2,6 +2,8 @@
 
 namespace dcms\update\includes;
 
+use dcms\update\helpers\Helper;
+
 class Database{
     private $wpdb;
     private $table_name;
@@ -115,4 +117,15 @@ class Database{
         $this->wpdb->query($sql);
     }
 
+
+    // Get metadata user
+    public function get_custom_meta_user($id_user){
+        $table = $this->wpdb->prefix . 'usermeta';
+
+        $key_in = Helper::get_config_fields_keys();
+
+        $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
+
+        return $this->wpdb->get_results($sql, OBJECT_K);
+    }
 }
