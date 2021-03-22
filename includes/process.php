@@ -71,7 +71,7 @@ class Process{
         $user_data['display_name']  = $item->name;
         $user_data['user_login']    = $item->identify;
         $user_data['first_name']    = $item->name;
-        $user_data['last_name']     = $item->first_lastname . ' ' . $item->second_lastname;
+        $user_data['last_name']     = $item->lastname;
 
         $id_user = $item->user_id;
 
