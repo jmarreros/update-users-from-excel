@@ -59,7 +59,5 @@ class Export{
         header('Content-Disposition: attachment;filename='. $filename);
         header('Cache-Control: max-age=0');
         $writer->save('php://output');
-
-        wp_die();
     }
 }
