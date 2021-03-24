@@ -6,9 +6,9 @@ final class Helper{
 
     public static function get_config_fields(){
         return [
-            'identify'  => 'Identificativo',
+            'identify'  => 'Identificativo', // Login column
             'pin'       => 'PIN', // Password Column
-            'number'    => 'Número', // Login column
+            'number'    => 'Número', 
             'reference' => 'Referencia',
             'nif'       => 'NIF',
             'name'      => 'Nombre',
