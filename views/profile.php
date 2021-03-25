@@ -4,13 +4,6 @@ use dcms\update\helpers\Helper;
 
 <br><hr><br>
 
-<style>
-.user-email-wrap p.description:after{
-    display:block;
-    content:'👉 Should be the same email in excel data';
-}
-</style>
-
 <h3><?php _e('Custom User Data', 'dcms-update-users-excel'); ?></h3>
 <table class="form-table">
 
@@ -37,3 +30,16 @@ use dcms\update\helpers\Helper;
             }
         ?>
 </table>
+
+<script>
+    // readonly for the email wordpress
+    (function( $ ) {
+	'use strict';
+
+        $( document ).ready(function() {
+            $('.user-email-wrap #email').attr('readonly', true);
+        });
+
+    })( jQuery );
+
+</script>
