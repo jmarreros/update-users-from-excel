@@ -40,7 +40,6 @@ class Process{
         $this->update_users(DCMS_UPDATE_COUNT_BATCH_PROCESS);
 
         Helper::exit_process(1, $redirection);
-
     }
 
     // Update products stock
@@ -48,8 +47,8 @@ class Process{
         $db = new Database();
         $items = $db->select_table_filter($count);
 
+        add_filter( 'send_email_change_email', '__return_false' );
         foreach ($items as $item) {
-
             // Insert or update a user
             $id_user = $this->save_user( $item);
 
@@ -59,8 +58,8 @@ class Process{
             } else{
                 $db->exclude_item_table($item->id);
             }
-
         }
+        add_filter( 'send_email_change_email', '__return_true' );
     }
 
     // Inserte new user

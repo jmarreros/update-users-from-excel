@@ -7,6 +7,7 @@ use dcms\update\includes\Database;
 class Plugin{
 
     public function __construct(){
+        // Activation/Desactivation
         register_activation_hook( DCMS_UPDATE_BASE_NAME, [ $this, 'dcms_activation_plugin'] );
         register_deactivation_hook( DCMS_UPDATE_BASE_NAME, [ $this, 'dcms_deactivation_plugin'] );
     }
