@@ -1,0 +1,150 @@
+# Copyright (C) 2021 Webservi.es
+# This file is distributed under the same license as the Sporting update users Excel plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Sporting update users Excel 1.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/dcms-update-users-excel\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2021-04-10T15:25:51+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.1.0\n"
+"X-Domain: dcms-update-users-excel\n"
+
+#. Plugin Name of the plugin
+msgid "Sporting update users Excel"
+msgstr ""
+
+#. Plugin URI of the plugin
+msgid "https://webservi.es"
+msgstr ""
+
+#. Description of the plugin
+msgid "Update users from an excel file"
+msgstr ""
+
+#. Author of the plugin
+msgid "Webservi.es"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://decodecms.com"
+msgstr ""
+
+#: includes/Submenu.php:18
+#: includes/Submenu.php:19
+msgid "Users"
+msgstr ""
+
+#: includes/Configuration.php:19
+msgid "File Path"
+msgstr ""
+
+#: includes/Configuration.php:25
+msgid "Path excel file"
+msgstr ""
+
+#: includes/Configuration.php:31
+msgid "Enter a valid absolute route, ex: /home/public_html/web/mi-file.xls"
+msgstr ""
+
+#: includes/Configuration.php:37
+msgid "Excel Structure"
+msgstr ""
+
+#: includes/Configuration.php:42
+msgid "Sheet Number"
+msgstr ""
+
+#: includes/Configuration.php:47
+msgid "Enter a sheet page number"
+msgstr ""
+
+#: includes/Configuration.php:68
+msgid "Cron"
+msgstr ""
+
+#: includes/Configuration.php:73
+msgid "Activate cron"
+msgstr ""
+
+#: includes/Configuration.php:78
+msgid "Enable or disable cron"
+msgstr ""
+
+#: includes/Configuration.php:147
+msgid "File doesn't exists"
+msgstr ""
+
+#: includes/Configuration.php:173
+msgid "Headers columns in .xlsx file doesn't exists"
+msgstr ""
+
+#: includes/Configuration.php:174
+msgid "Try this sheets number: "
+msgstr ""
+
+#: dcms-update-users-excel.php:63
+#: views/main-screen.php:7
+msgid "Settings"
+msgstr ""
+
+#: views/list-users.php:67
+msgid "Latest imported"
+msgstr ""
+
+#: views/list-users.php:70
+msgid " Items"
+msgstr ""
+
+#: views/list-users.php:71
+msgid "every "
+msgstr ""
+
+#: views/list-users.php:73
+msgid "Pending items: "
+msgstr ""
+
+#: views/list-users.php:75
+msgid "Last modified Excel file process: "
+msgstr ""
+
+#: views/main-screen.php:8
+msgid "Avanzado"
+msgstr ""
+
+#: views/main-screen.php:16
+msgid "Users List"
+msgstr ""
+
+#: views/main-screen.php:49
+msgid "Settings Saved"
+msgstr ""
+
+#: views/main-screen.php:64
+#: views/main-screen.php:68
+msgid "Force update"
+msgstr ""
+
+#: views/main-screen.php:65
+msgid "Dont wait for the cron process"
+msgstr ""
+
+#: views/main-screen.php:71
+msgid "Reset log"
+msgstr ""
+
+#: views/main-screen.php:72
+msgid "Reset file date and remove temporal log data"
+msgstr ""
+
+#: views/main-screen.php:75
+msgid "Reset"
+msgstr ""
+
+#: views/profile.php:7
+msgid "Custom User Data"
+msgstr ""

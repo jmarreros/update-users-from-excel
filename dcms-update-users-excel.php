@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: Sporting update users Excel
-Plugin URI: https://decodecms.com
+Plugin URI: https://webservi.es
 Description: Update users from an excel file
 Version: 1.1
-Author: Jhon Marreros Guzmán
+Author: Webservi.es
 Author URI: https://decodecms.com
 Text Domain: dcms-update-users-excel
 Domain Path: languages

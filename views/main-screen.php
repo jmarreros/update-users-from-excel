@@ -4,8 +4,8 @@ if ( ! current_user_can( 'manage_options' ) ) return; // only administrator
 
 $plugin_tabs = [];
 $plugin_tabs['log'] = "Log";
-$plugin_tabs['settings'] = "Settings";
-$plugin_tabs['advanced'] = "Advanced";
+$plugin_tabs['settings'] = __("Settings", 'dcms-update-users-excel');
+$plugin_tabs['advanced'] = __("Avanzado", 'dcms-update-users-excel');
 
 // Get Current tab
 $current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : 'log';
