@@ -41,7 +41,7 @@ final class Loader{
 		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
 		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
 		define ('DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting');
-		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 500); // Amount of registers to update every time
+		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 1000); // Amount of registers to update every time
 		define ('DCMS_UPDATE_INTERVAL_SECONDS', 900); // For cron taks
 
 		if ( ! defined( 'DCMS_PIN_SENT' ) ) define ('DCMS_PIN_SENT', 'dcms-pin-sent');
