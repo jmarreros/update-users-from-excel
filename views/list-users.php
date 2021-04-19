@@ -61,7 +61,7 @@ $last_modified_file = get_option('dcms_last_modified_file',0);
 
 <form method="post" id="frm-export" class="frm-export" action="<?php echo admin_url( 'admin-post.php' ) ?>" >
         <input type="hidden" name="action" value="process_export_users_imported">
-        <button type="submit" class="btn-export button button-primary"><?php _e('Export all', DCMS_PIN_TEXT_DOMAIN) ?></button>
+        <button type="submit" class="btn-export button button-primary"><?php _e('Export all', 'dcms-update-users-excel') ?></button>
 </form>
 
 <h2><?php _e('Latest imported', 'dcms-update-users-excel') ?></h2>
