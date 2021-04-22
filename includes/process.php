@@ -30,7 +30,7 @@ class Process{
         $last_modified =  $file->file_has_changed();
 
         // Validate if the file has changed, then insert into database
-        if ( $last_modified >= get_option('dcms_last_modified_file') ){
+        if ( $last_modified ){
 
             $this->rows_into_table($file, $last_modified);
             update_option('dcms_last_modified_file', $last_modified );
