@@ -64,8 +64,9 @@ final class Helper{
 
     // Validate email
     public static function validate_email_user($email, $user_id = -1){
-        if ( empty( $email) ){
-            return  uniqid().'@emailempty.com';
+
+        if ( empty( $email) || ! is_email($email) ){
+            return  uniqid().'@emailtemp.com';
         } else {
             $id = email_exists($email);
             if ( is_int($id) && $user_id != $id ) {
