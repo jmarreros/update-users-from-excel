@@ -75,7 +75,7 @@ class Database{
         $sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
                     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                     `identify` int(10) unsigned DEFAULT NULL,
-                    `pin` int(10) unsigned DEFAULT NULL,
+                    `pin` varchar(50) DEFAULT NULL,
                     `number` int(10) unsigned DEFAULT NULL,
                     `reference` varchar(50) DEFAULT NULL,
                     `nif` varchar(50) DEFAULT NULL,
