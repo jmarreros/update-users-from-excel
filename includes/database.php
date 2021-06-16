@@ -104,6 +104,41 @@ class Database{
         dbDelta($sql);
     }
 
+    // Optimization, create View
+    public function create_view(){
+        $sql = "CREATE OR REPLACE VIEW wp_dcms_view_users AS
+                SELECT user_id,
+                    GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'number' THEN meta_value END) as 'number',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'reference' THEN meta_value END) as 'reference',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'nif' THEN meta_value END) as 'nif',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'first_name' THEN meta_value END) as 'name',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'lastname' THEN meta_value END) as 'lastname',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'birth' THEN meta_value END) as 'birth',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_type' THEN meta_value END) as 'sub_type',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'address' THEN meta_value END) as 'address',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'postal_code' THEN meta_value END) as 'postal_code',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'local' THEN meta_value END) as 'local',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as 'email',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as 'phone',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as 'mobile',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit'
+                FROM
+                    wp_usermeta WHERE
+                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
+                                'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
+                                'soc_type', 'observation7', 'observation5', 'sub_permit')
+                GROUP BY user_id";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+
+
     // Truncate table
     public function truncate_table(){
         $sql = "TRUNCATE TABLE {$this->table_name};";

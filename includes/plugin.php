@@ -23,6 +23,7 @@ class Plugin{
         // Create table
         $db = new Database();
         $db->create_table();
+        $db->create_view(); //optimization
 
         // // Create cron
         if( ! wp_next_scheduled( 'dcms_cron_hook' ) ) {
