@@ -7,12 +7,16 @@ use dcms\update\helpers\Helper;
 class Database{
     private $wpdb;
     private $table_name;
+    private $table_meta;
+    private $view_users;
 
     public function __construct(){
         global $wpdb;
         $this->wpdb = $wpdb;
 
         $this->table_name = $this->wpdb->prefix . 'dcms_update_users';
+        $this->view_users = $this->wpdb->prefix . 'dcms_view_users';
+        $this->table_meta = $this->wpdb->prefix . 'usermeta';
     }
 
     // Insert data
@@ -106,7 +110,7 @@ class Database{
 
     // Optimization, create View
     public function create_view(){
-        $sql = "CREATE OR REPLACE VIEW wp_dcms_view_users AS
+        $sql = "CREATE OR REPLACE VIEW {$this->view_users} AS
                 SELECT user_id,
                     GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
                     GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
@@ -128,14 +132,23 @@ class Database{
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
                     GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit'
                 FROM
-                    wp_usermeta WHERE
+                    {$this->table_meta} WHERE
                     meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
                                 'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
                                 'soc_type', 'observation7', 'observation5', 'sub_permit')
+                WHERE identify IS NOT NULL
                 GROUP BY user_id";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql);
+    }
+
+    // Get all user data from view
+    public function get_custom_users_with_meta(){
+        $sql = "SELECT * FROM {$this->view_users}
+                WHERE identify <> '' ORDER BY cast(identify as unsigned)";
+
+        return $this->wpdb->get_results($sql);
     }
 
 
@@ -153,13 +166,13 @@ class Database{
 
 
     // Get metadata user
-    public function get_custom_meta_user($id_user){
-        $table = $this->wpdb->prefix . 'usermeta';
+    // public function get_custom_meta_user($id_user){
+    //     $table = $this->wpdb->prefix . 'usermeta';
 
-        $key_in = Helper::get_config_fields_keys();
+    //     $key_in = Helper::get_config_fields_keys();
 
-        $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
+    //     $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
 
-        return $this->wpdb->get_results($sql, OBJECT_K);
-    }
+    //     return $this->wpdb->get_results($sql, OBJECT_K);
+    // }
 }

@@ -34,17 +34,16 @@ class Export{
 
         // Get all the users
         $db = new Database();
-        $users= get_users(['role__not_in' => 'Administrator']);
 
-        // Fill excel body
+        $users = $db->get_custom_users_with_meta();
+
         $irow = 2;
         foreach ($users as $user) {
             $icol = 1;
-            $user_meta = $db->get_custom_meta_user($user->ID);
 
             foreach ($fields as $key => $value) {
-                if ( isset($user_meta[$key]) ){
-                    $content = $user_meta[$key]->meta_value;
+                if ( $user->$key <> '' ){
+                    $content = $user->$key;
                     $sheet->setCellValueByColumnAndRow($icol, $irow, $content);
                 }
                 $icol++;
