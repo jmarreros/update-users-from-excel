@@ -135,8 +135,7 @@ class Database{
                     {$this->table_meta} WHERE
                     meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
                                 'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
-                                'soc_type', 'observation7', 'observation5', 'sub_permit')
-                WHERE identify IS NOT NULL
+                                'soc_type', 'observation7', 'observation5', 'sub_permit') 
                 GROUP BY user_id";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
