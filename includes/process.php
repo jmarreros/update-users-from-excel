@@ -157,9 +157,9 @@ class Process{
 
             $row = [];
 
-            foreach ($headers_ids as $key => $value) {
-                if ( strlen($item[$value]) > 0 ){
-                    $row[$key] = $item[$value];
+            foreach ($headers_ids as $header_key => $value) {
+                if ( isset($item[$value]) && strlen($item[$value]) > 0 ){
+                    $row[$header_key] = $item[$value];
                 }
             }
 

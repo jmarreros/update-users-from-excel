@@ -97,6 +97,7 @@ class Database{
                     `observation7` varchar(250) DEFAULT NULL,
                     `observation5` varchar(250) DEFAULT NULL,
                     `sub_permit`  varchar(100) DEFAULT NULL,
+                    `observation_person`  varchar(100) DEFAULT NULL,
                     -- `id_user` int(10) unsigned DEFAULT NULL,
                     `date_update` datetime DEFAULT NULL,
                     `date_file` int(10) unsigned NOT NULL DEFAULT '0',
@@ -130,12 +131,13 @@ class Database{
                     GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit'
+                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation_person' THEN meta_value END) as 'observation_person'
                 FROM
                     {$this->table_meta} WHERE
                     meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
                                 'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
-                                'soc_type', 'observation7', 'observation5', 'sub_permit') 
+                                'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person') 
                 GROUP BY user_id";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

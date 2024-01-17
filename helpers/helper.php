@@ -24,7 +24,8 @@ final class Helper{
             'soc_type'  => 'Tipo de Socio',
             'observation7'   => 'Observa 7',
             'observation5'   => 'Observa 5',
-            'sub_permit'=> 'Permiso Abono'
+            'sub_permit'=> 'Permiso Abono',
+	        'observation_person' => 'Observaciones Persona',
         ];
     }
 
