@@ -8,6 +8,9 @@ class Process {
 	public function __construct() {
 		add_action( 'admin_post_process_form', [ $this, 'process_force_update' ] );
 		add_action( 'admin_post_reset_log', [ $this, 'process_reset_log' ] );
+
+		// Process upload file ajax
+		add_action( 'wp_ajax_dcms_process_batch_ajax', [ $this, 'process_batch_ajax' ] );
 	}
 
 	// Manual process update - with redirection
@@ -177,7 +180,7 @@ class Process {
 	}
 
 	// Reset process
-	public function process_reset_log() {
+	public function process_reset_log(): void {
 		$db = new Database();
 		$db->truncate_table();
 
@@ -185,5 +188,48 @@ class Process {
 		Helper::exit_process( 1, true );
 	}
 
+
+	// Process upload file ajax
+	public function process_batch_ajax(): void {
+		$batch  = DCMS_UPDATE_COUNT_BATCH_PROCESS;
+		$total  = $_REQUEST['total'] ?? false;
+		$step   = $_REQUEST['step'] ?? 0;
+		$count  = $step * $batch;
+		$status = 0;
+
+		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
+			error_log( 'Error de Nonce!' );
+
+			return;
+		}
+
+		// Procesamos la información
+		sleep( 0.25 );
+		error_log( "step: " . $step . " - count: " . $count );
+		// ----
+
+		$step ++;
+
+		// Get the total
+		if ( ! $total ) {
+			$total = 10000;
+		}
+
+		// Comprobamos la finalización
+		if ( $count > $total ) {
+			$status = 1;
+		}
+
+		// Construimos la respuesta
+		$res = [
+			'status' => $status,
+			'step'   => $step,
+			'count'  => $count,
+			'total'  => $total,
+		];
+
+		echo json_encode( $res );
+		wp_die();
+	}
 
 }

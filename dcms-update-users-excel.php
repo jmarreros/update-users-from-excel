@@ -3,7 +3,7 @@
 Plugin Name: Sporting update users Excel
 Plugin URI: https://webservi.es
 Description: Update users from an excel file
-Version: 1.1
+Version: 2.0
 Author: Webservi.es
 Author URI: https://decodecms.com
 Text Domain: dcms-update-users-excel
@@ -19,7 +19,7 @@ require __DIR__ . '/vendor/autoload.php';
 use dcms\update\includes\Plugin;
 use dcms\update\includes\Submenu;
 use dcms\update\includes\Configuration;
-use dcms\update\includes\Readfile;
+use dcms\update\includes\Enqueue;
 use dcms\update\includes\Process;
 use dcms\update\includes\Cron;
 use dcms\update\includes\Profile;
@@ -31,34 +31,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Plugin class to handle settings constants and loading files
-**/
-final class Loader{
+ **/
+final class Loader {
 
 	// Define all the constants we need
-	public function define_constants(){
-		define ('DCMS_UPDATE_VERSION', '1.2');
-		define ('DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ));
-		define ('DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ));
-		define ('DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ));
-		define ('DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting');
-		define ('DCMS_UPDATE_COUNT_BATCH_PROCESS', 1000); // Amount of registers to update every time
-		define ('DCMS_UPDATE_INTERVAL_SECONDS', 900); // For cron taks
+	public function define_constants():void {
+		define( 'DCMS_UPDATE_VERSION', '2.0' );
+		define( 'DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ) );
+		define( 'DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ) );
+		define( 'DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ) );
+		define( 'DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting' );
+		define( 'DCMS_UPDATE_COUNT_BATCH_PROCESS', 500 ); // Amount of registers to update every time
+		define( 'DCMS_UPDATE_INTERVAL_SECONDS', 900 ); // For cron taks
 
-		if ( ! defined( 'DCMS_PIN_SENT' ) ) define ('DCMS_PIN_SENT', 'dcms-pin-sent');
+		if ( ! defined( 'DCMS_PIN_SENT' ) ) {
+			define( 'DCMS_PIN_SENT', 'dcms-pin-sent' );
+		}
 	}
 
 	// Load tex domain
-	public function load_domain(){
-		add_action('plugins_loaded', function(){
-			$path_languages = dirname(DCMS_UPDATE_BASE_NAME).'/languages/';
-			load_plugin_textdomain('dcms-update-users-excel', false, $path_languages );
-		});
+	public function load_domain(): void {
+		add_action( 'plugins_loaded', function () {
+			$path_languages = dirname( DCMS_UPDATE_BASE_NAME ) . '/languages/';
+			load_plugin_textdomain( 'dcms-update-users-excel', false, $path_languages );
+		} );
 	}
 
 	// Add link to plugin list
-	public function add_link_plugin(){
-		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), function( $links ){
-			$cad = (strpos(DCMS_UPDATE_SUBMENU,'?')) ? "&" : '?';
+	public function add_link_plugin(): void {
+		add_action( 'plugin_action_links_' . plugin_basename( __FILE__ ), function ( $links ) {
+			$cad = ( strpos( DCMS_UPDATE_SUBMENU, '?' ) ) ? "&" : '?';
+
 			return array_merge( array(
 				'<a href="' . esc_url( admin_url( DCMS_UPDATE_SUBMENU . $cad . 'page=update-users-excel' ) ) . '">' . __( 'Settings', 'dcms-update-users-excel' ) . '</a>'
 			), $links );
@@ -66,7 +69,7 @@ final class Loader{
 	}
 
 	// Initialize all
-	public function init(){
+	public function init() {
 		$this->define_constants();
 		$this->load_domain();
 		$this->add_link_plugin();
@@ -77,6 +80,7 @@ final class Loader{
 		new Cron();
 		new Profile();
 		new Export();
+		new Enqueue();
 	}
 
 }
