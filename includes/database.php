@@ -2,81 +2,87 @@
 
 namespace dcms\update\includes;
 
-use dcms\update\helpers\Helper;
+class Database {
+	private $wpdb;
+	private $table_name;
+	private $table_meta;
+	private $view_users;
 
-class Database{
-    private $wpdb;
-    private $table_name;
-    private $table_meta;
-    private $view_users;
+	public function __construct() {
+		global $wpdb;
+		$this->wpdb = $wpdb;
 
-    public function __construct(){
-        global $wpdb;
-        $this->wpdb = $wpdb;
+		$this->table_name = $this->wpdb->prefix . 'dcms_update_users';
+		$this->view_users = $this->wpdb->prefix . 'dcms_view_users';
+		$this->table_meta = $this->wpdb->prefix . 'usermeta';
+	}
 
-        $this->table_name = $this->wpdb->prefix . 'dcms_update_users';
-        $this->view_users = $this->wpdb->prefix . 'dcms_view_users';
-        $this->table_meta = $this->wpdb->prefix . 'usermeta';
-    }
+	// Insert data
+	public function insert_data( $row ) {
+		return $this->wpdb->insert( $this->table_name, $row );
+	}
 
-    // Insert data
-    public function insert_data( $row ){
-        return $this->wpdb->insert($this->table_name, $row);
-    }
+	// Read table with current lastmodified date file
+	public function select_table_resume( $limit = 100 ) {
+		$last_modified = get_option( 'dcms_last_modified_file', null );
 
-    // Read table with current lastmodified date file
-    public function select_table_resume( $limit = 100 ){
-        $last_modified = get_option('dcms_last_modified_file', NULL);
+		$sql = "SELECT * FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NOT NULL ORDER BY ID DESC LIMIT {$limit}";
 
-        $sql = "SELECT * FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NOT NULL ORDER BY ID DESC LIMIT {$limit}";
-        return $this->wpdb->get_results($sql);
-    }
-
-
-    // Count pending items to import
-    public function count_pending_imported(){
-        $last_modified = get_option('dcms_last_modified_file', NULL);
-
-        $sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NULL AND excluded = 0";
-        return $this->wpdb->get_var($sql);
-    }
+		return $this->wpdb->get_results( $sql );
+	}
 
 
-    // Select table for last modified date and not date_modified related with product id
-    public function select_table_filter($limit = 0){
+	// Count pending items to import
+	public function count_pending_imported() {
+		$last_modified = get_option( 'dcms_last_modified_file', null );
 
-        $last_modified  = get_option('dcms_last_modified_file');
-        $table_user     = $this->wpdb->prefix."users";
+		$sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NULL AND excluded = 0";
 
-        $sql = "SELECT *, u.id user_id FROM {$this->table_name} uu
-                LEFT JOIN {$table_user} u ON uu.identify = u.user_login
-                WHERE uu.date_file = {$last_modified} AND uu.date_update IS NULL AND uu.excluded = 0";
+		return $this->wpdb->get_var( $sql );
+	}
 
 
-        if ( $limit > 0 ) $sql .= " LIMIT {$limit}";
+	// Get un-proccessed users from log table in batch
+	public function get_import_users_by_batch( $limit = 0 ) {
+		$table_user = $this->wpdb->prefix . "users";
 
-        return $this->wpdb->get_results($sql);
-    }
+		$sql = "SELECT *, u.id user_id FROM $this->table_name uu
+                LEFT JOIN $table_user u ON uu.identify = u.user_login
+                WHERE uu.date_update IS NULL AND uu.excluded = 0";
 
-    // Update date field log table
-    public function update_date_item_log_table($id_table) : void{
-        $sql = "UPDATE {$this->table_name} SET date_update = NOW()
+		if ( $limit > 0 ) {
+			$sql .= " LIMIT $limit";
+		}
+
+		return $this->wpdb->get_results( $sql );
+	}
+
+	//Get total import users
+	public function get_total_import_users(): int {
+		$sql = "SELECT COUNT(*) FROM $this->table_name";
+
+		return $this->wpdb->get_var( $sql );
+	}
+
+	// Update date field log table
+	public function update_date_item_log_table( $id_table ): void {
+		$sql = "UPDATE {$this->table_name} SET date_update = NOW()
                 WHERE id = {$id_table}";
 
-        $this->wpdb->query($sql);
-    }
+		$this->wpdb->query( $sql );
+	}
 
-    // Update exclude field log table
-    public function update_exclude_item_log_table($id_table) : void{
-        $sql = "UPDATE {$this->table_name} SET excluded = 1
+	// Update exclude field log table
+	public function update_exclude_item_log_table( $id_table ): void {
+		$sql = "UPDATE {$this->table_name} SET excluded = 1
                 WHERE id = {$id_table}";
 
-        $this->wpdb->query($sql);
-    }
+		$this->wpdb->query( $sql );
+	}
 
-    // Init activation create table
-    public function create_table(){
-        $sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
+	// Init activation create table
+	public function create_table() {
+		$sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
                     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                     `identify` int(10) unsigned DEFAULT NULL,
                     `pin` varchar(50) DEFAULT NULL,
@@ -105,13 +111,13 @@ class Database{
                     PRIMARY KEY (`id`)
           )";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
 
-    // Optimization, create View
-    public function create_view(){
-        $sql = "CREATE OR REPLACE VIEW {$this->view_users} AS
+	// Optimization, create View
+	public function create_view() {
+		$sql = "CREATE OR REPLACE VIEW {$this->view_users} AS
                 SELECT user_id,
                     GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
                     GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
@@ -140,40 +146,40 @@ class Database{
                                 'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person') 
                 GROUP BY user_id";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+		dbDelta( $sql );
+	}
 
-    // Get all user data from view
-    public function get_custom_users_with_meta(){
-        $sql = "SELECT * FROM {$this->view_users}
+	// Get all user data from view
+	public function get_custom_users_with_meta() {
+		$sql = "SELECT * FROM {$this->view_users}
                 WHERE identify <> '' ORDER BY cast(identify as unsigned)";
 
-        return $this->wpdb->get_results($sql);
-    }
+		return $this->wpdb->get_results( $sql );
+	}
 
 
-    // Truncate table
-    public function truncate_table(){
-        $sql = "TRUNCATE TABLE {$this->table_name};";
-        $this->wpdb->query($sql);
-    }
+	// Truncate table
+	public function truncate_table() {
+		$sql = "TRUNCATE TABLE {$this->table_name};";
+		$this->wpdb->query( $sql );
+	}
 
-    // Detelete table on desactivate
-    public function drop_table(){
-        $sql = "DROP TABLE IF EXISTS {$this->table_name};";
-        $this->wpdb->query($sql);
-    }
+	// Detelete table on desactivate
+	public function drop_table() {
+		$sql = "DROP TABLE IF EXISTS {$this->table_name};";
+		$this->wpdb->query( $sql );
+	}
 
 
-    // Get metadata user
-    // public function get_custom_meta_user($id_user){
-    //     $table = $this->wpdb->prefix . 'usermeta';
+	// Get metadata user
+	// public function get_custom_meta_user($id_user){
+	//     $table = $this->wpdb->prefix . 'usermeta';
 
-    //     $key_in = Helper::get_config_fields_keys();
+	//     $key_in = Helper::get_config_fields_keys();
 
-    //     $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
+	//     $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
 
-    //     return $this->wpdb->get_results($sql, OBJECT_K);
-    // }
+	//     return $this->wpdb->get_results($sql, OBJECT_K);
+	// }
 }

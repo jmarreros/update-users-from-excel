@@ -30,16 +30,13 @@ class Process {
 
 	// Automatic process import users, create or update
 	public function process_import_data(): void {
-
-		$this->rows_into_table();
-
 		$db    = new Database();
-		$items = $db->select_table_filter( DCMS_UPDATE_COUNT_BATCH_PROCESS );
+		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS );
 
 		add_filter( 'send_email_change_email', '__return_false' );
 
 		foreach ( $items as $item ) {
-			// Insert or update a user
+			// Insert or update a user and metadata
 			$id_user = $this->save_import_user( $item );
 
 			// Update log table
@@ -112,8 +109,74 @@ class Process {
 	}
 
 
+	// Reset process
+	public function process_reset_log(): void {
+		$db = new Database();
+		$db->truncate_table();
+
+		update_option( 'dcms_last_modified_file', 0 );
+		wp_redirect( $_SERVER['HTTP_REFERER'] );
+	}
+
+
+	// Upload file ajax
+	public function upload_file_ajax(): void {
+		$res = [];
+
+		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
+			error_log( 'Error de Nonce!' );
+
+			return;
+		}
+
+		if ( isset( $_FILES['file'] ) && count( $_FILES['file'] ) ) {
+
+			$name_file = $_FILES['file']['name'];
+			$tmp_name  = $_FILES['file']['tmp_name'];
+
+			$this->validate_extension_file( $name_file );
+			$this->create_file_path();
+
+			if ( move_uploaded_file( $tmp_name, $this->path_file ) ) {
+
+				$this->data_file_into_table();
+
+				$res = [
+					'status'  => 1,
+					'message' => "El archivo se agregó correctamente"
+				];
+			}
+
+		} else {
+			$res = [
+				'status'  => 0,
+				'message' => "Existe un error en la subida del archivo"
+			];
+		}
+
+		wp_send_json( $res );
+	}
+
+	// Extension file validation
+	private function validate_extension_file( $name_file ): void {
+		$path_parts       = pathinfo( $name_file );
+		$ext              = $path_parts['extension'];
+		$allow_extensions = [ 'xls', 'xlsx' ];
+
+		if ( ! in_array( $ext, $allow_extensions ) ) {
+			$res = [
+				'status'  => 0,
+				'message' => "Extensión de archivo no permitida"
+			];
+
+			wp_send_json( $res );
+		}
+
+	}
+
+
 	// Insert data rows from file into custom DB table
-	private function rows_into_table(): void {
+	private function data_file_into_table(): void {
 		$file = new Readfile( $this->path_file );
 
 		$data = $file->get_data_from_file();
@@ -160,69 +223,6 @@ class Process {
 		}
 	}
 
-	// Reset process
-	public function process_reset_log(): void {
-		$db = new Database();
-		$db->truncate_table();
-
-		update_option( 'dcms_last_modified_file', 0 );
-		wp_redirect( $_SERVER['HTTP_REFERER'] );
-	}
-
-
-	// Upload file ajax
-	public function upload_file_ajax(): void {
-		$res = [];
-
-		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
-			error_log( 'Error de Nonce!' );
-
-			return;
-		}
-
-		if ( isset( $_FILES['file'] ) && count( $_FILES['file'] ) ) {
-
-			$name_file = $_FILES['file']['name'];
-			$tmp_name  = $_FILES['file']['tmp_name'];
-
-			$this->validate_extension_file( $name_file );
-			$this->create_file_path();
-
-			if ( move_uploaded_file( $tmp_name, $this->path_file ) ) {
-				$res = [
-					'status'  => 1,
-					'message' => "El archivo se agregó correctamente"
-				];
-			}
-
-		} else {
-			$res = [
-				'status'  => 0,
-				'message' => "Existe un error en la subida del archivo"
-			];
-		}
-
-		wp_send_json( $res );
-	}
-
-	// Extension file validation
-	private function validate_extension_file( $name_file ): void {
-		$path_parts       = pathinfo( $name_file );
-		$ext              = $path_parts['extension'];
-		$allow_extensions = [ 'xls', 'xlsx' ];
-
-		if ( ! in_array( $ext, $allow_extensions ) ) {
-			$res = [
-				'status'  => 0,
-				'message' => "Extensión de archivo no permitida"
-			];
-
-			wp_send_json( $res );
-		}
-
-	}
-
-
 	// Process upload file ajax
 	public function process_batch_ajax(): void {
 		$batch  = DCMS_UPDATE_COUNT_BATCH_PROCESS;
@@ -237,22 +237,19 @@ class Process {
 			return;
 		}
 
-		// Procesamos la información
-		sleep( 0.25 );
-		error_log( "step: " . $step . " - count: " . $count );
-		// ----
-
 		$step ++;
 
 		// Get the total
 		if ( ! $total ) {
-			$total = 10000;
+			$total = $this->get_total_import_users();
 		}
 
 		// Comprobamos la finalización
 		if ( $count > $total ) {
 			$status = 1;
 		}
+
+		$this->process_import_data();
 
 		// Construimos la respuesta
 		$res = [
@@ -264,6 +261,12 @@ class Process {
 
 		echo json_encode( $res );
 		wp_die();
+	}
+
+	private function get_total_import_users(): int {
+		$db = new Database();
+
+		return $db->get_total_import_users();
 	}
 
 }

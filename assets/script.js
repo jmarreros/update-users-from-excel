@@ -63,11 +63,11 @@
             dataType: 'json',
             success: function(res){
                 if ( res.status  === 0){
-                    $('.process-info').html(`<strong>Procesados ${res.count} de ${res.total}
-                                            <br> Paso: ${res.step}</strong>`);
+                    $('.process-info').addClass('processing').html(`<span>Procesados ${res.count} de ${res.total}
+                                            <br> Paso: ${res.step}</span>`);
                     process_upload(res.step, res.total)
                 } else {
-                    $('.process-info').text('Finalizado');
+                    $('.process-info').removeClass('processing').html('<span>Finalizado</span>');
                 }
             }
 
