@@ -21,7 +21,6 @@ use dcms\update\includes\Submenu;
 use dcms\update\includes\Configuration;
 use dcms\update\includes\Enqueue;
 use dcms\update\includes\Process;
-use dcms\update\includes\Cron;
 use dcms\update\includes\Profile;
 use dcms\update\includes\Export;
 
@@ -35,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Loader {
 
 	// Define all the constants we need
-	public function define_constants():void {
+	public function define_constants(): void {
 		define( 'DCMS_UPDATE_VERSION', '2.0' );
 		define( 'DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ) );
 		define( 'DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ) );
@@ -43,6 +42,8 @@ final class Loader {
 		define( 'DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting' );
 		define( 'DCMS_UPDATE_COUNT_BATCH_PROCESS', 500 ); // Amount of registers to update every time
 		define( 'DCMS_UPDATE_INTERVAL_SECONDS', 900 ); // For cron taks
+		define( 'DCMS_UPDATE_DIRECTORY_UPLOAD', '/file-users-import/' );
+		define( 'DCMS_UPDATE_FILE_NAME_IMPORT', 'list-users-import.xlsx' );
 
 		if ( ! defined( 'DCMS_PIN_SENT' ) ) {
 			define( 'DCMS_PIN_SENT', 'dcms-pin-sent' );
@@ -77,7 +78,6 @@ final class Loader {
 		new SubMenu();
 		new Configuration();
 		new Process();
-		new Cron();
 		new Profile();
 		new Export();
 		new Enqueue();

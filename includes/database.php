@@ -58,16 +58,16 @@ class Database{
         return $this->wpdb->get_results($sql);
     }
 
-    // Update log table
-    public function update_item_table($id_table){
+    // Update date field log table
+    public function update_date_item_log_table($id_table) : void{
         $sql = "UPDATE {$this->table_name} SET date_update = NOW()
                 WHERE id = {$id_table}";
 
         $this->wpdb->query($sql);
     }
 
-    // Update exluded register
-    public function exclude_item_table($id_table){
+    // Update exclude field log table
+    public function update_exclude_item_log_table($id_table) : void{
         $sql = "UPDATE {$this->table_name} SET excluded = 1
                 WHERE id = {$id_table}";
 
