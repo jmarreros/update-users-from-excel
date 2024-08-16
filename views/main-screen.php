@@ -8,7 +8,6 @@ if ( ! current_user_can( 'manage_options' ) ) {
 
 $plugin_tabs             = [];
 $plugin_tabs['upload']   = __( "Upload", 'dcms-update-users-excel' );
-$plugin_tabs['log']      = __( "Log", 'dcms-update-users-excel' );
 $plugin_tabs['settings'] = __( "Settings", 'dcms-update-users-excel' );
 $plugin_tabs['advanced'] = __( "Advanced", 'dcms-update-users-excel' );
 
@@ -26,12 +25,9 @@ $current_tab = $_GET['tab'] ?? 'upload';
 		switch ( $current_tab ) {
 			case 'upload':
 				wp_enqueue_script( 'update-users-script' );
-                wp_enqueue_style( 'update-users-style' );
+				wp_enqueue_style( 'update-users-style' );
 
 				include_once 'partials/upload-file.php';
-				break;
-			case 'log':
-				include_once 'partials/list-users.php';
 				break;
 			case 'settings':
 				include_once 'partials/settings.php';
@@ -49,7 +45,7 @@ $current_tab = $_GET['tab'] ?? 'upload';
 
 
 // Create tabs and activate current tab
-function print_tab_selection( $current_tab, $plugin_tabs ) {
+function print_tab_selection( $current_tab, $plugin_tabs ): void {
 	$cad = ( strpos( DCMS_UPDATE_SUBMENU, '?' ) ) ? "&" : '?';
 
 	echo '<h2 class="nav-tab-wrapper">';

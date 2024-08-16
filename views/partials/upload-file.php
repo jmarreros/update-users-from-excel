@@ -6,14 +6,16 @@
                 <span>Selecciona el archivo xls: </span>
                 <input type="file" id="file" name="upload-file"/>
             </div>
-            <input class="button button-primary" type="submit" id="submit" value="Enviar archivo" />
+            <input class="button button-primary" type="submit" id="submit" value="Enviar archivo"/>
         </form>
 
-        <div id="message"></div>
     </section>
 
-    <a id='process-upload-ajax' class='button button-primary' href='#'>Procesar</a>
-</div>
-<hr/>
-<div class='process-info'>
+    <a id='process-upload-ajax' style="display:none;" class='button button-primary' href='#'>Procesar</a>
+
+    <br>
+
+    <div class='process-info'>
+    </div>
+
 </div>

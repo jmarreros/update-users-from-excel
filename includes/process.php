@@ -256,6 +256,7 @@ class Process {
 			'status' => $status,
 			'step'   => $step,
 			'count'  => $count,
+			'batch'  => $batch,
 			'total'  => $total,
 		];
 

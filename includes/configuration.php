@@ -10,27 +10,9 @@ class Configuration{
         add_action('admin_init', [$this, 'init_configuration']);
     }
 
-    // Register seccions and fields
+    // Register sections and fields
     public function init_configuration(){
         register_setting('dcms_user_excel_options_bd', 'dcms_user_excel_options', [$this, 'dcms_validate_cb']);
-
-        // Path Section
-        add_settings_section('dcms_usexcel_section_file',
-                            __('File Path','dcms-update-users-excel'),
-                            [$this,'dcms_section_cb'],
-                            'dcms_usexcel_sfields' );
-
-
-        add_settings_field('dcms_usexcel_input_file',
-                            __('Path excel file','dcms-update-users-excel'),
-                            [$this, 'dcms_section_input_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_file',
-                            ['label_for' => 'dcms_usexcel_input_file',
-                            'class' => 'regular-text',
-                            'description' => __('Enter a valid absolute route, ex: /home/public_html/web/mi-file.xls','dcms-update-users-excel'),
-                            'required' => true]
-        );
 
         // Excel Fields section
         add_settings_section('dcms_usexcel_section_excel',
@@ -63,20 +45,6 @@ class Configuration{
 
         }
 
-
-        add_settings_section('dcms_usexcel_section_cron',
-                        __('Cron','dcms-update-users-excel'),
-                                [$this,'dcms_section_cb'],
-                                'dcms_usexcel_sfields' );
-
-        add_settings_field('dcms_usexcel_cron_field',
-                            __('Activate cron','dcms-update-users-excel'),
-                            [$this, 'dcms_section_check_cb'],
-                            'dcms_usexcel_sfields',
-                            'dcms_usexcel_section_cron',
-                            ['label_for' => 'dcms_usexcel_cron_field',
-                             'description' => __('Enable or disable cron','dcms-update-users-excel')]
-        );
     }
 
     // Callback section
@@ -187,15 +155,4 @@ class Configuration{
     }
 
 }
-
-
-
-// add_settings_field('dcms_usexcel_isweb_field',
-//                     __('Product for web column name','dcms-update-users-excel'),
-//                     [$this, 'dcms_section_input_cb'],
-//                     'dcms_usexcel_sfields',
-//                     'dcms_usexcel_section_excel',
-//                     ['label_for' => 'dcms_usexcel_isweb_field']
-// );
-
 
