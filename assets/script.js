@@ -65,7 +65,12 @@
                                             <br> Lote: ${res.step} de ${Math.round(res.total / res.batch)}</span>`);
                     process_upload(res.step, res.total)
                 } else {
-                    $('.process-info').removeClass('processing').html('<span>Finalizado</span>');
+                    if ( res.count_errors > 0 ) {
+                        $('.process-info').html('<span>Hubo ' + res.count_errors + ' error(es) al realizar la importación</span>');
+                    } else{
+                        $('.process-info').removeClass('processing').html('<span>Importación finalizada</span>');
+                    }
+
                 }
             }
 

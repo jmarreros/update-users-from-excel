@@ -172,6 +172,20 @@ class Database {
 	}
 
 
+	// Check if there are errors
+	public function count_excluded_items(): int {
+		$sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE excluded = 1";
+
+		return $this->wpdb->get_var( $sql );
+	}
+
+	public function update_password_user_import($id_user, $password){
+		$user_table = $this->wpdb->prefix . 'users';
+		$sql = "UPDATE $user_table SET user_pass = MD5('$password') WHERE ID = $id_user";
+
+		return $this->wpdb->query($sql);
+	}
+
 	// Get metadata user
 	// public function get_custom_meta_user($id_user){
 	//     $table = $this->wpdb->prefix . 'usermeta';

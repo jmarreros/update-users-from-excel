@@ -60,21 +60,24 @@ class Process {
 		$user_data['first_name']   = $item->name;
 		$user_data['last_name']    = $item->lastname;
 
+		$password = str_pad( $item->pin, 4, "0", STR_PAD_LEFT );
+
 		$id_user = $item->user_id;
 
 		if ( ! is_null( $id_user ) ) {
 			// update wp_users
-			$user_data['ID'] = $id_user;
-
-			$user_data['user_email'] = Helper::validate_email_user( $item->email );
+			$user_data['ID']         = $id_user;
+			$user_data['user_email'] = Helper::validate_email_user( $item->email, $id_user );
 			$item->email             = $user_data['user_email']; // update item email for user meta
-
 
 			$id_user = wp_update_user( $user_data );
 
+			$db = new Database();
+			$db->update_password_user_import( $id_user, $password );
+
 		} else {
 			// insert wp_users
-			$user_data['user_pass']  = $item->pin;
+			$user_data['user_pass']  = $password;
 			$user_data['user_email'] = Helper::validate_email_user( $item->email );
 			$item->email             = $user_data['user_email']; // update item email for user meta
 
@@ -143,7 +146,7 @@ class Process {
 
 				$res = [
 					'status'  => 1,
-					'message' => "El archivo se agregó correctamente"
+					'message' => "El archivo se agregó correctamente... procesando..."
 				];
 			}
 
@@ -225,11 +228,12 @@ class Process {
 
 	// Process upload file ajax
 	public function process_batch_ajax(): void {
-		$batch  = DCMS_UPDATE_COUNT_BATCH_PROCESS;
-		$total  = $_REQUEST['total'] ?? false;
-		$step   = $_REQUEST['step'] ?? 0;
-		$count  = $step * $batch;
-		$status = 0;
+		$batch        = DCMS_UPDATE_COUNT_BATCH_PROCESS;
+		$total        = $_REQUEST['total'] ?? false;
+		$step         = $_REQUEST['step'] ?? 0;
+		$count        = $step * $batch;
+		$status       = 0;
+		$count_errors = 0;
 
 		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
 			error_log( 'Error de Nonce!' );
@@ -246,22 +250,30 @@ class Process {
 
 		// Comprobamos la finalización
 		if ( $count > $total ) {
-			$status = 1;
+			$status       = 1;
+			$count_errors = $this->count_excluded_items();
 		}
 
 		$this->process_import_data();
 
 		// Construimos la respuesta
 		$res = [
-			'status' => $status,
-			'step'   => $step,
-			'count'  => $count,
-			'batch'  => $batch,
-			'total'  => $total,
+			'status'       => $status,
+			'step'         => $step,
+			'count'        => $count,
+			'batch'        => $batch,
+			'total'        => $total,
+			'count_errors' => $count_errors,
 		];
 
 		echo json_encode( $res );
 		wp_die();
+	}
+
+	private function count_excluded_items(): int {
+		$db = new Database();
+
+		return $db->count_excluded_items();
 	}
 
 	private function get_total_import_users(): int {
