@@ -7,9 +7,8 @@ if ( ! current_user_can( 'manage_options' ) ) {
 } // only administrator
 
 $plugin_tabs             = [];
-$plugin_tabs['upload']   = __( "Upload", 'dcms-update-users-excel' );
+$plugin_tabs['upload']   = __( "Subir", 'dcms-update-users-excel' );
 $plugin_tabs['settings'] = __( "Settings", 'dcms-update-users-excel' );
-$plugin_tabs['advanced'] = __( "Advanced", 'dcms-update-users-excel' );
 
 // Get Current tab
 $current_tab = $_GET['tab'] ?? 'upload';
@@ -17,7 +16,7 @@ $current_tab = $_GET['tab'] ?? 'upload';
 
     <div class="wrap">
 
-        <h1><?php _e( 'Users List', 'dcms-update-users-excel' ) ?></h1>
+        <h1><?php _e( 'Importación de usuarios', 'dcms-update-users-excel' ) ?></h1>
 
 		<?php
 		print_tab_selection( $current_tab, $plugin_tabs );
@@ -31,9 +30,6 @@ $current_tab = $_GET['tab'] ?? 'upload';
 				break;
 			case 'settings':
 				include_once 'partials/settings.php';
-				break;
-			case 'advanced':
-				include_once 'partials/advanced.php';
 				break;
 		}
 

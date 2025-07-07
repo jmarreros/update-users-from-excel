@@ -27,3 +27,8 @@
     background-color: #fff3cd;
     border-color: #ffeeba;
 }
+
+.form-container.export{
+    margin:15px 0;
+    text-align: right;
+}

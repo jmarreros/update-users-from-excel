@@ -64,6 +64,9 @@ class Readfile {
 			$headers_id[ $key ] = ( ! empty( $text ) && $found !== false ) ? $found : - 1;
 		}
 
+		error_log(print_r('Los Headers',true));
+		error_log(print_r($headers_id,true));
+
 		return $headers_id;
 	}
 

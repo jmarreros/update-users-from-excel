@@ -11,6 +11,9 @@ use dcms\update\helpers\Helper;
         <?php
             $fields = Helper::get_config_fields();
 
+            // Remover $field de roles ya que lo actualizará el plugin custom-area-sporting
+            unset($fields['roles']);
+
             foreach ($fields as $key => $value) {
             ?>
             <tr>

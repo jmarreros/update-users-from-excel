@@ -30,7 +30,7 @@ class Export{
             $icol++;
         }
         $styleArray = Helper::get_style_header_cells();
-        $sheet->getStyle('A1:T1')->applyFromArray($styleArray);
+        $sheet->getStyle('A1:U1')->applyFromArray($styleArray);
 
         // Get all the users
         $db = new Database();

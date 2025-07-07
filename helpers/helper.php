@@ -26,6 +26,7 @@ final class Helper {
 			'observation5'       => 'Observa 5',
 			'sub_permit'         => 'Permiso Abono',
 			'observation_person' => 'Observaciones Persona',
+			'roles'              => 'Roles', // User roles separated by comma
 		];
 	}
 

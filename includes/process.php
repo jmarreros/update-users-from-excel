@@ -9,8 +9,6 @@ class Process {
 	private string $path_file = '';
 
 	public function __construct() {
-		add_action( 'admin_post_reset_log', [ $this, 'process_reset_log' ] );
-
 		// Process upload file ajax
 		add_action( 'wp_ajax_dcms_ajax_add_file', [ $this, 'upload_file_ajax' ] );
 		add_action( 'wp_ajax_dcms_process_batch_ajax', [ $this, 'process_batch_ajax' ] );
