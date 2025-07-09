@@ -27,7 +27,7 @@ class Profile {
 			return;
 		}
 
-		// Save everyfield
+		// Save every field
 		$fields = Helper::get_config_fields();
 		foreach ( $fields as $key => $value ) {
 			if ( isset( $_POST[ $key ] ) ) {

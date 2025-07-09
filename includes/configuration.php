@@ -35,8 +35,8 @@ class Configuration {
 		$config_fields = Helper::get_config_fields();
 
 		foreach ( $config_fields as $key => $value ) {
-			$field_name = "dcms_usexcel_${key}_field";
-			$field_msg  = "${value} column name";
+			$field_name = "dcms_usexcel_{$key}_field";
+			$field_msg  = "$value column name";
 			add_settings_field( $field_name,
 				__( $field_msg, 'dcms-update-users-excel' ),
 				[ $this, 'dcms_section_input_cb' ],
@@ -131,7 +131,7 @@ class Configuration {
 		$config_fields = Helper::get_config_fields();
 
 		foreach ( $config_fields as $key => $value ) {
-			$name              = "dcms_usexcel_${key}_field";
+			$name              = "dcms_usexcel_{$key}_field";
 			$columns[ $value ] = $output[ $name ];
 		}
 

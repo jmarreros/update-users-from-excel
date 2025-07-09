@@ -48,7 +48,7 @@ class Process {
 	}
 
 
-	// Inserte new user
+	// Inserte new user or update existing user
 	private function save_import_user( $item ): int {
 
 		// general data wp_users
@@ -98,13 +98,50 @@ class Process {
 		return $id_user;
 	}
 
-	// Update new user
+	// Update new user meta data
 	private function save_user_additional_fields( $id_user, $item ): void {
 		$fields = Helper::get_config_fields();
 
 		foreach ( $fields as $key => $value ) {
 			if ( ! is_null( $item->{$key} ) ) { // Validate for a value for updating
 				update_user_meta( $id_user, $key, $item->{$key} );
+			}
+
+			if ( $key === 'roles' ) {
+				// Validate if the constant DCMS_CUSTOMAREA_ROLES from the custom-area-sporting plugin is defined
+				if ( ! defined( 'DCMS_CUSTOMAREA_ROLES' ) ) {
+					error_log( "La constante DCMS_CUSTOMAREA_ROLES no está definida." );
+					continue;
+				}
+
+				$custom_roles = DCMS_CUSTOMAREA_ROLES;
+
+				$user = new \WP_User( $id_user );
+
+				// Remove all custom roles
+				foreach ( $custom_roles as $role ) {
+					if ( $user->has_cap( $role ) ) {
+						$user->remove_role( $role );
+					}
+				}
+
+				if ( ! empty( $item->roles ) ) {
+					// Convert to lowercase and add underscore in spaces
+					$roles = explode( ',', $item->roles );
+					$roles = array_map( function ( $role ) {
+						return strtolower( str_replace( ' ', '_', trim( $role ) ) );
+					}, $roles );
+
+					// Add new custom roles
+					foreach ( $roles as $role ) {
+						if ( ! empty( $role ) && in_array( $role, $custom_roles ) ) {
+							$user->add_role( $role );
+						} else {
+							error_log( "El rol {$role} no es válido para el usuario {$id_user}" );
+						}
+					}
+				}
+
 			}
 		}
 	}

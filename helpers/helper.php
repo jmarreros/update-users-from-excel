@@ -67,10 +67,5 @@ final class Helper {
 
 		return $email;
 	}
-
-	//	public static function get_config_fields_keys() {
-	//		return '"' . implode( '","', array_keys( self::get_config_fields() ) ) . '"';
-	//	}
-
 }
 
