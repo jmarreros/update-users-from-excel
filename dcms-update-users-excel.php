@@ -3,7 +3,7 @@
 Plugin Name: Sporting update users Excel
 Plugin URI: https://webservi.es
 Description: Update users from an excel file
-Version: 2.4
+Version: 2.5
 Author: Webservi.es
 Author URI: https://decodecms.com
 Text Domain: dcms-update-users-excel
@@ -23,6 +23,7 @@ use dcms\update\includes\Enqueue;
 use dcms\update\includes\Process;
 use dcms\update\includes\Profile;
 use dcms\update\includes\Export;
+use dcms\update\includes\Synchronize;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -35,7 +36,7 @@ final class Loader {
 
 	// Define all the constants we need
 	public function define_constants(): void {
-		define( 'DCMS_UPDATE_VERSION', '2.4' );
+		define( 'DCMS_UPDATE_VERSION', '2.5' );
 		define( 'DCMS_UPDATE_PATH', plugin_dir_path( __FILE__ ) );
 		define( 'DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ) );
 		define( 'DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ) );
@@ -81,6 +82,7 @@ final class Loader {
 		new Profile();
 		new Export();
 		new Enqueue();
+		new Synchronize();
 	}
 
 }

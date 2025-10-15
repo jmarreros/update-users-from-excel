@@ -140,15 +140,6 @@ class Process {
 	}
 
 
-	// Reset process
-	public function process_reset_log(): void {
-		$db = new Database();
-		$db->truncate_table();
-
-		update_option( 'dcms_last_modified_file', 0 );
-		wp_redirect( $_SERVER['HTTP_REFERER'] );
-	}
-
 
 	// Upload file ajax
 	public function upload_file_ajax(): void {
@@ -231,7 +222,7 @@ class Process {
 
 		// Clear data table
 		$db = new Database();
-		$db->truncate_table();
+		$db->truncate_table_import();
 
 		foreach ( $data as $key => $item ) {
 
@@ -250,7 +241,7 @@ class Process {
 			$row['date_file'] = 0;
 
 			// Insert data
-			$db->insert_data( $row );
+			$db->insert_tmp_import_data( $row );
 		}
 	}
 

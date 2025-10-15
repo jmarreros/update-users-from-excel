@@ -22,7 +22,7 @@ class Plugin{
     // Deactivate plugin
     public function dcms_deactivation_plugin(){
         $db = new Database();
-        $db->drop_table();
+        $db->drop_tables();
 
         update_option('dcms_last_modified_file', 0);
 

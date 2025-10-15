@@ -14,16 +14,15 @@ class Database {
 		$this->wpdb = $wpdb;
 
 		$this->table_tmp_import = $this->wpdb->prefix . 'dcms_temp_import';
-		$this->table_user_data = $this->wpdb->prefix . 'dcms_user_data';
-		$this->view_users = $this->wpdb->prefix . 'dcms_view_users';
-		$this->table_meta = $this->wpdb->prefix . 'usermeta';
+		$this->table_user_data  = $this->wpdb->prefix . 'dcms_user_data';
+		$this->view_users       = $this->wpdb->prefix . 'dcms_view_users';
+		$this->table_meta       = $this->wpdb->prefix . 'usermeta';
 	}
 
-	// Insert data
-	public function insert_data( $row ): \mysqli_result|bool|int|null {
+	// Insert data tmp table to import
+	public function insert_tmp_import_data( $row ): \mysqli_result|bool|int|null {
 		return $this->wpdb->insert( $this->table_tmp_import, $row );
 	}
-
 
 	// Get unprocessed users from the log table in batch
 	public function get_import_users_by_batch( $limit = 0 ): array|object|null {
@@ -49,7 +48,7 @@ class Database {
 
 
 	// Init activation creates table
-	public function create_tables() :void {
+	public function create_tables(): void {
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
@@ -131,10 +130,11 @@ class Database {
                                 'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person', 'roles')
                 GROUP BY user_id";
 
-		$result = $this->wpdb->query($sql);
-		if ($result === false) {
-			error_log('Error al crear vista: ' . $this->wpdb->last_error);
+		$result = $this->wpdb->query( $sql );
+		if ( $result === false ) {
+			error_log( 'Error al crear vista: ' . $this->wpdb->last_error );
 		}
+
 		return $result;
 	}
 
@@ -148,14 +148,17 @@ class Database {
 
 
 	// Truncate table
-	public function truncate_table() {
+	public function truncate_table_import(): void {
 		$sql = "TRUNCATE TABLE {$this->table_tmp_import};";
 		$this->wpdb->query( $sql );
 	}
 
 	// Delete table on desactivate
-	public function drop_table() {
+	public function drop_tables(): void {
 		$sql = "DROP TABLE IF EXISTS {$this->table_tmp_import};";
+		$this->wpdb->query( $sql );
+
+		$sql = "DROP TABLE IF EXISTS {$this->table_user_data};";
 		$this->wpdb->query( $sql );
 	}
 
@@ -167,11 +170,22 @@ class Database {
 		return $this->wpdb->get_var( $sql );
 	}
 
-	public function update_password_user_import($id_user, $password){
+	public function update_password_user_import( $id_user, $password ): \mysqli_result|bool|int|null {
 		$user_table = $this->wpdb->prefix . 'users';
-		$sql = "UPDATE $user_table SET user_pass = MD5('$password') WHERE ID = $id_user";
+		$sql        = "UPDATE $user_table SET user_pass = MD5('$password') WHERE ID = $id_user";
 
-		return $this->wpdb->query($sql);
+		return $this->wpdb->query( $sql );
 	}
 
+
+	// Truncate user data table
+	public function truncate_table_user_data(): void {
+		$sql = "TRUNCATE TABLE {$this->table_user_data};";
+		$this->wpdb->query( $sql );
+	}
+
+	// Insert data user data
+	public function insert_data_user_data($user_data): \mysqli_result|bool|int|null {
+		return $this->wpdb->insert( $this->table_user_data, $user_data );
+	}
 }
