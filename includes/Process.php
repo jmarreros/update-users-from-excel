@@ -36,13 +36,6 @@ class Process {
 		foreach ( $items as $item ) {
 			// Insert or update a user and metadata
 			$id_user = $this->save_import_user( $item );
-
-			// Update log table
-			if ( $id_user ) {
-				$db->update_date_item_log_table( $item->id );
-			} else {
-				$db->update_exclude_item_log_table( $item->id );
-			}
 		}
 		add_filter( 'send_email_change_email', '__return_true' );
 	}

@@ -3,50 +3,33 @@
 namespace dcms\update\includes;
 
 class Database {
-	private $wpdb;
-	private $table_name;
-	private $table_meta;
-	private $view_users;
+	private \wpdb $wpdb;
+	private string $table_tmp_import;
+	private string $table_user_data;
+	private string $table_meta;
+	private string $view_users;
 
 	public function __construct() {
 		global $wpdb;
 		$this->wpdb = $wpdb;
 
-		$this->table_name = $this->wpdb->prefix . 'dcms_update_users';
+		$this->table_tmp_import = $this->wpdb->prefix . 'dcms_temp_import';
+		$this->table_user_data = $this->wpdb->prefix . 'dcms_user_data';
 		$this->view_users = $this->wpdb->prefix . 'dcms_view_users';
 		$this->table_meta = $this->wpdb->prefix . 'usermeta';
 	}
 
 	// Insert data
-	public function insert_data( $row ) {
-		return $this->wpdb->insert( $this->table_name, $row );
-	}
-
-	// Read table with current lastmodified date file
-	public function select_table_resume( $limit = 100 ) {
-		$last_modified = get_option( 'dcms_last_modified_file', null );
-
-		$sql = "SELECT * FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NOT NULL ORDER BY ID DESC LIMIT {$limit}";
-
-		return $this->wpdb->get_results( $sql );
+	public function insert_data( $row ): \mysqli_result|bool|int|null {
+		return $this->wpdb->insert( $this->table_tmp_import, $row );
 	}
 
 
-	// Count pending items to import
-	public function count_pending_imported() {
-		$last_modified = get_option( 'dcms_last_modified_file', null );
-
-		$sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE date_file = {$last_modified} AND date_update IS NULL AND excluded = 0";
-
-		return $this->wpdb->get_var( $sql );
-	}
-
-
-	// Get un-processed users from log table in batch
-	public function get_import_users_by_batch( $limit = 0 ) {
+	// Get unprocessed users from the log table in batch
+	public function get_import_users_by_batch( $limit = 0 ): array|object|null {
 		$table_user = $this->wpdb->prefix . "users";
 
-		$sql = "SELECT *, u.id user_id FROM $this->table_name uu
+		$sql = "SELECT *, u.id user_id FROM $this->table_tmp_import uu
                 LEFT JOIN $table_user u ON uu.identify = u.user_login
                 WHERE uu.date_update IS NULL AND uu.excluded = 0";
 
@@ -59,31 +42,18 @@ class Database {
 
 	//Get total import users
 	public function get_total_import_users(): int {
-		$sql = "SELECT COUNT(*) FROM $this->table_name";
+		$sql = "SELECT COUNT(*) FROM $this->table_tmp_import";
 
 		return $this->wpdb->get_var( $sql );
 	}
 
-	// Update date field log table
-	public function update_date_item_log_table( $id_table ): void {
-		$sql = "UPDATE {$this->table_name} SET date_update = NOW()
-                WHERE id = {$id_table}";
 
-		$this->wpdb->query( $sql );
-	}
+	// Init activation creates table
+	public function create_tables() :void {
 
-	// Update exclude field log table
-	public function update_exclude_item_log_table( $id_table ): void {
-		$sql = "UPDATE {$this->table_name} SET excluded = 1
-                WHERE id = {$id_table}";
+		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-		$this->wpdb->query( $sql );
-	}
-
-	// Init activation create table
-	public function create_table() {
-		$sql = " CREATE TABLE IF NOT EXISTS {$this->table_name} (
-                    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		$common_fields = "
                     `identify` int(10) unsigned DEFAULT NULL,
                     `pin` varchar(50) DEFAULT NULL,
                     `number` int(10) unsigned DEFAULT NULL,
@@ -104,16 +74,29 @@ class Database {
                     `observation5` varchar(250) DEFAULT NULL,
                     `sub_permit`  varchar(100) DEFAULT NULL,
                     `observation_person`  varchar(100) DEFAULT NULL,
-                    `roles` varchar(250) DEFAULT NULL,
-                    -- `id_user` int(10) unsigned DEFAULT NULL,
+                    `roles` varchar(250) DEFAULT NULL";
+
+
+		// Create temp import table
+		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS {$this->table_tmp_import} (
+     				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+                    $common_fields,
                     `date_update` datetime DEFAULT NULL,
-                    `date_file` int(10) unsigned NOT NULL DEFAULT '0',
+                    `user_id` bigint(20) DEFAULT NULL,
                     `excluded` tinyint(1) DEFAULT '0',
                     PRIMARY KEY (`id`)
           )";
 
-		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		dbDelta( $sql );
+		dbDelta( $sql_tmp_import );
+
+		// Create user data table
+		$sql_user_data = " CREATE TABLE IF NOT EXISTS {$this->table_user_data} (
+     				`id` bigint(20) unsigned NOT NULL,
+                    $common_fields,
+                    PRIMARY KEY (`id`)
+          )";
+
+		dbDelta( $sql_user_data );
 	}
 
 	// Optimization, create View
@@ -166,20 +149,20 @@ class Database {
 
 	// Truncate table
 	public function truncate_table() {
-		$sql = "TRUNCATE TABLE {$this->table_name};";
+		$sql = "TRUNCATE TABLE {$this->table_tmp_import};";
 		$this->wpdb->query( $sql );
 	}
 
-	// Detelete table on desactivate
+	// Delete table on desactivate
 	public function drop_table() {
-		$sql = "DROP TABLE IF EXISTS {$this->table_name};";
+		$sql = "DROP TABLE IF EXISTS {$this->table_tmp_import};";
 		$this->wpdb->query( $sql );
 	}
 
 
 	// Check if there are errors
 	public function count_excluded_items(): int {
-		$sql = "SELECT COUNT(id) FROM {$this->table_name} WHERE excluded = 1";
+		$sql = "SELECT COUNT(id) FROM {$this->table_tmp_import} WHERE excluded = 1";
 
 		return $this->wpdb->get_var( $sql );
 	}
@@ -191,14 +174,4 @@ class Database {
 		return $this->wpdb->query($sql);
 	}
 
-	// Get metadata user
-	// public function get_custom_meta_user($id_user){
-	//     $table = $this->wpdb->prefix . 'usermeta';
-
-	//     $key_in = Helper::get_config_fields_keys();
-
-	//     $sql = "SELECT meta_key, meta_value FROM {$table} WHERE user_id = {$id_user} AND meta_key in ({$key_in})";
-
-	//     return $this->wpdb->get_results($sql, OBJECT_K);
-	// }
 }
