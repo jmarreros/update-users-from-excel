@@ -17,6 +17,7 @@ namespace dcms\update;
 require __DIR__ . '/vendor/autoload.php';
 
 use dcms\update\includes\Plugin;
+use dcms\update\includes\Roles;
 use dcms\update\includes\Submenu;
 use dcms\update\includes\Configuration;
 use dcms\update\includes\Enqueue;
@@ -83,6 +84,7 @@ final class Loader {
 		new Export();
 		new Enqueue();
 		new Synchronize();
+		new Roles();
 	}
 
 }

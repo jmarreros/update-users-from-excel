@@ -120,40 +120,7 @@ class Process {
 			}
 
 			if ( $key === 'roles' ) {
-				// Validate if the constant DCMS_CUSTOMAREA_ROLES from the custom-area-sporting plugin is defined
-				if ( ! defined( 'DCMS_CUSTOMAREA_ROLES' ) ) {
-					error_log( "La constante DCMS_CUSTOMAREA_ROLES no está definida." );
-					continue;
-				}
-
-				$custom_roles = DCMS_CUSTOMAREA_ROLES;
-
-				$user = new \WP_User( $id_user );
-
-				// Remove all custom roles
-				foreach ( $custom_roles as $role ) {
-					if ( $user->has_cap( $role ) ) {
-						$user->remove_role( $role );
-					}
-				}
-
-				if ( ! empty( $item->roles ) ) {
-					// Convert to lowercase and add underscore in spaces
-					$roles = explode( ',', $item->roles );
-					$roles = array_map( function ( $role ) {
-						return strtolower( str_replace( ' ', '_', trim( $role ) ) );
-					}, $roles );
-
-					// Add new custom roles
-					foreach ( $roles as $role ) {
-						if ( ! empty( $role ) && in_array( $role, $custom_roles ) ) {
-							$user->add_role( $role );
-						} else {
-							error_log( "El rol {$role} no es válido para el usuario {$id_user}" );
-						}
-					}
-				}
-
+				Roles::update_custom_roles( $id_user, $item->roles );
 			}
 		}
 	}

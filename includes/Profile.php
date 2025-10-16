@@ -21,7 +21,7 @@ class Profile {
 
 
 	// Save custom section
-	public function save_custom_section( $user_id ) {
+	public function save_custom_section( $user_id ): void {
 		// validation
 		if ( ! current_user_can( 'edit_user', $user_id ) ) {
 			return;
@@ -29,11 +29,29 @@ class Profile {
 
 		// Save every field
 		$fields = Helper::get_config_fields();
+		$user_meta = [];
 		foreach ( $fields as $key => $value ) {
 			if ( isset( $_POST[ $key ] ) ) {
 				$field = sanitize_text_field( $_POST[ $key ] );
+				$user_meta[ $key ] = $field;
 				update_user_meta( $user_id, $key, $field );
 			}
+		}
+
+
+		// Get user roles
+		$roles = $_POST['dcms_user_roles']??[];
+		// Separar por comas, eliminar espacios y convertir a minúsculas
+		$roles = array_map( function ( $role ) {
+			return strtolower( str_replace( ' ', '_', trim( $role ) ) );
+		}, $roles );
+		// array to string
+		$roles = implode( ',', $roles );
+
+		// For custom user data table
+		if ( ! empty( $user_meta ) ) {
+			$db = new Database();
+			$db->insert_or_update_user_data( $user_id, $user_meta );
 		}
 
 	}
