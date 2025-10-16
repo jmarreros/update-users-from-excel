@@ -188,4 +188,34 @@ class Database {
 	public function insert_data_user_data($user_data): \mysqli_result|bool|int|null {
 		return $this->wpdb->insert( $this->table_user_data, $user_data );
 	}
+
+	// Insert or update user data
+	 // Insert or update user data
+	 public function insert_or_update_user_data($id_user, $user_data): \mysqli_result|bool|int|null {
+	    $user_data['id'] = $id_user;
+
+	    $table = $this->table_user_data;
+
+	    // Prepara las columnas y los marcadores de posición para la parte INSERT
+	    $columns = '`' . implode( '`, `', array_keys( $user_data ) ) . '`';
+	    $placeholders = implode( ', ', array_fill( 0, count( $user_data ), '%s' ) );
+
+	    // Prepara la parte ON DUPLICATE KEY UPDATE
+	    $update_pairs = [];
+	    foreach ( $user_data as $key => $value ) {
+	        if ( $key !== 'id' ) { // No es necesario actualizar la clave primaria
+	            $update_pairs[] = "`$key` = VALUES(`$key`)";
+	        }
+	    }
+	    $update_clause = implode( ', ', $update_pairs );
+
+	    // Construye la consulta final
+	    $sql = "INSERT INTO `$table` ($columns) VALUES ($placeholders)
+	            ON DUPLICATE KEY UPDATE $update_clause";
+
+	    // Prepara y ejecuta la consulta
+	    $query = $this->wpdb->prepare( $sql, array_values( $user_data ) );
+
+	    return $this->wpdb->query( $query );
+	 }
 }

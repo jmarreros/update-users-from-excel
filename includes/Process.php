@@ -36,15 +36,20 @@ class Process {
 		foreach ( $items as $item ) {
 			// Insert or update a user and metadata
 			$id_user = $this->save_import_user( $item );
+
+			// Insert or update custom user data table
+			if ( $id_user ) {
+				$user_data = $this->get_user_data( $item );
+				$db->insert_or_update_user_data( $id_user, $user_data );
+			}
 		}
 		add_filter( 'send_email_change_email', '__return_true' );
 	}
 
-
 	// Inserte new user or update existing user
 	private function save_import_user( $item ): int {
 
-		// general data wp_users
+		// General data for wp_users
 		$user_data                 = [];
 		$user_data['display_name'] = $item->name;
 		$user_data['user_login']   = $item->identify;
@@ -88,7 +93,21 @@ class Process {
 			return 0;
 		}
 
+
 		return $id_user;
+	}
+
+
+	private function get_user_data( $item ): array {
+		$fields    = Helper::get_config_fields();
+		$user_data = [];
+		foreach ( $fields as $key => $value ) {
+			if ( ! is_null( $item->{$key} ) ) { // Validate for a value for updating
+				$user_data[ $key ] = $item->{$key};
+			}
+		}
+
+		return $user_data;
 	}
 
 	// Update new user meta data
@@ -138,7 +157,6 @@ class Process {
 			}
 		}
 	}
-
 
 
 	// Upload file ajax
@@ -237,8 +255,6 @@ class Process {
 					$row[ $header_key ] = $item[ $value ];
 				}
 			}
-
-			$row['date_file'] = 0;
 
 			// Insert data
 			$db->insert_tmp_import_data( $row );
