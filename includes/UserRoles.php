@@ -5,7 +5,7 @@ namespace dcms\update\includes;
 /**
  * Class for creating a dashboard submenu
  */
-class Roles{
+class UserRoles{
 	public function __construct() {
 	}
 
@@ -48,4 +48,7 @@ class Roles{
 
 		return implode( ',', $final_roles );
 	}
+
+
+
 }

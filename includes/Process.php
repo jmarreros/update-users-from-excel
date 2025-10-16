@@ -120,7 +120,7 @@ class Process {
 			}
 
 			if ( $key === 'roles' ) {
-				Roles::update_custom_roles( $id_user, $item->roles );
+				UserRoles::update_custom_roles( $id_user, $item->roles );
 			}
 		}
 	}
