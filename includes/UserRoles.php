@@ -12,7 +12,7 @@ class UserRoles{
 	public static function update_custom_roles($id_user, $current_roles): string{
 		// Validate if the constant DCMS_CUSTOMAREA_ROLES from the custom-area-sporting plugin is defined
 		if ( ! defined( 'DCMS_CUSTOMAREA_ROLES' ) ) {
-			error_log( "La constante DCMS_CUSTOMAREA_ROLES no está definida." );
+//			error_log( "La constante DCMS_CUSTOMAREA_ROLES no está definida." );
 			return '';
 		}
 
