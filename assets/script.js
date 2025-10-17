@@ -69,6 +69,7 @@
                         $('.process-info').html('<span>Hubo ' + res.count_errors + ' error(es) al realizar la importación</span>');
                     } else{
                         $('.process-info').removeClass('processing').html('<span>Importación finalizada</span>');
+                        $('#file').val('');
                     }
 
                 }

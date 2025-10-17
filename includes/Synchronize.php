@@ -63,7 +63,7 @@ class Synchronize {
 			}
 
 			// Add user ID to the data array
-			$user_data['id'] = $user_id;
+			$user_data['user_id'] = $user_id;
 
 			// Insert user data into custom table
 			$db->insert_data_user_data( $user_data );

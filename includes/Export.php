@@ -15,9 +15,8 @@ class Export{
     }
 
     // Export data
-    public function process_export_data_user(){
-
-        // Create Excel file
+    public function process_export_data_user(): void {
+        // Create an Excel file
         $spreadsheet = new Spreadsheet();
         $writer = new Xlsx($spreadsheet);
         $sheet = $spreadsheet->getActiveSheet();

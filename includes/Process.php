@@ -46,7 +46,7 @@ class Process {
 		add_filter( 'send_email_change_email', '__return_true' );
 	}
 
-	// Inserte new user or update existing user
+	// Inserte new user or update an existing user
 	private function save_import_user( $item ): int {
 
 		// General data for wp_users

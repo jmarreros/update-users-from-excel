@@ -76,7 +76,7 @@ class Database {
                     `roles` varchar(250) DEFAULT NULL";
 
 
-		// Create temp import table
+		// Create a temp import table
 		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS {$this->table_tmp_import} (
      				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                     $common_fields,
@@ -88,11 +88,11 @@ class Database {
 
 		dbDelta( $sql_tmp_import );
 
-		// Create user data table
-		$sql_user_data = " CREATE TABLE IF NOT EXISTS {$this->table_user_data} (
-     				`id` bigint(20) unsigned NOT NULL,
+		// Create a user data table
+		$sql_user_data = " CREATE TABLE IF NOT EXISTS $this->table_user_data (
+     				`user_id` bigint(20) unsigned NOT NULL,
                     $common_fields,
-                    PRIMARY KEY (`id`)
+                    PRIMARY KEY (`user_id`)
           )";
 
 		dbDelta( $sql_user_data );
@@ -140,8 +140,8 @@ class Database {
 
 	// Get all user data from view
 	public function get_custom_users_with_meta() {
-		$sql = "SELECT * FROM {$this->view_users}
-                WHERE identify <> '' ORDER BY cast(identify as unsigned)";
+		$sql = "SELECT * FROM $this->table_user_data
+				WHERE identify <> '' ORDER BY cast(identify as unsigned)";
 
 		return $this->wpdb->get_results( $sql );
 	}
@@ -149,23 +149,23 @@ class Database {
 
 	// Truncate table
 	public function truncate_table_import(): void {
-		$sql = "TRUNCATE TABLE {$this->table_tmp_import};";
+		$sql = "TRUNCATE TABLE $this->table_tmp_import";
 		$this->wpdb->query( $sql );
 	}
 
 	// Delete table on desactivate
 	public function drop_tables(): void {
-		$sql = "DROP TABLE IF EXISTS {$this->table_tmp_import};";
+		$sql = "DROP TABLE IF EXISTS $this->table_tmp_import";
 		$this->wpdb->query( $sql );
 
-		$sql = "DROP TABLE IF EXISTS {$this->table_user_data};";
+		$sql = "DROP TABLE IF EXISTS $this->table_user_data";
 		$this->wpdb->query( $sql );
 	}
 
 
 	// Check if there are errors
 	public function count_excluded_items(): int {
-		$sql = "SELECT COUNT(id) FROM {$this->table_tmp_import} WHERE excluded = 1";
+		$sql = "SELECT COUNT(id) FROM $this->table_tmp_import WHERE excluded = 1";
 
 		return $this->wpdb->get_var( $sql );
 	}
@@ -180,7 +180,7 @@ class Database {
 
 	// Truncate user data table
 	public function truncate_table_user_data(): void {
-		$sql = "TRUNCATE TABLE {$this->table_user_data};";
+		$sql = "TRUNCATE TABLE $this->table_user_data";
 		$this->wpdb->query( $sql );
 	}
 
@@ -192,7 +192,7 @@ class Database {
 
 	// Insert or update user data
 	public function insert_or_update_user_data( $id_user, $user_data ): \mysqli_result|bool|int|null {
-		$user_data['id'] = $id_user;
+		$user_data['user_id'] = $id_user;
 
 		$table = $this->table_user_data;
 
@@ -203,7 +203,7 @@ class Database {
 		// Prepara la parte ON DUPLICATE KEY UPDATE
 		$update_pairs = [];
 		foreach ( $user_data as $key => $value ) {
-			if ( $key !== 'id' ) { // No es necesario actualizar la clave primaria
+			if ( $key !== 'user_id' ) { // No es necesario actualizar la clave primaria
 				$update_pairs[] = "`$key` = VALUES(`$key`)";
 			}
 		}
@@ -222,7 +222,7 @@ class Database {
 
 	// Delete user data
 	public function delete_user_data( $id_user ): \mysqli_result|bool|int|null {
-		$sql = $this->wpdb->prepare( "DELETE FROM {$this->table_user_data} WHERE id = %d", $id_user );
+		$sql = $this->wpdb->prepare( "DELETE FROM $this->table_user_data WHERE user_id = %d", $id_user );
 
 		return $this->wpdb->query( $sql );
 	}
