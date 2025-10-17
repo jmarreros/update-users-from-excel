@@ -98,46 +98,6 @@ class Database {
 		dbDelta( $sql_user_data );
 	}
 
-	// Optimization, create View
-	public function create_view() {
-		$sql = "CREATE OR REPLACE VIEW {$this->view_users} AS
-                SELECT user_id,
-                    GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'number' THEN meta_value END) as 'number',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'reference' THEN meta_value END) as 'reference',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'nif' THEN meta_value END) as 'nif',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'first_name' THEN meta_value END) as 'name',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'lastname' THEN meta_value END) as 'lastname',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'birth' THEN meta_value END) as 'birth',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_type' THEN meta_value END) as 'sub_type',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'address' THEN meta_value END) as 'address',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'postal_code' THEN meta_value END) as 'postal_code',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'local' THEN meta_value END) as 'local',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as 'email',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as 'phone',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as 'mobile',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'observation_person' THEN meta_value END) as 'observation_person',
-                    GROUP_CONCAT(CASE WHEN meta_key = 'roles' THEN meta_value END) as 'roles'
-                FROM
-                    {$this->table_meta} WHERE
-                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
-                                'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
-                                'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person', 'roles')
-                GROUP BY user_id";
-
-		$result = $this->wpdb->query( $sql );
-		if ( $result === false ) {
-			error_log( 'Error al crear vista: ' . $this->wpdb->last_error );
-		}
-
-		return $result;
-	}
-
 	// Get all user data from view
 	public function get_custom_users_with_meta() {
 		$sql = "SELECT * FROM $this->table_user_data
@@ -184,11 +144,11 @@ class Database {
 		$this->wpdb->query( $sql );
 	}
 
+
 	// Insert data user data
 	public function insert_data_user_data( $user_data ): \mysqli_result|bool|int|null {
 		return $this->wpdb->insert( $this->table_user_data, $user_data );
 	}
-
 
 	// Insert or update user data
 	public function insert_or_update_user_data( $id_user, $user_data ): \mysqli_result|bool|int|null {
@@ -219,11 +179,92 @@ class Database {
 		return $this->wpdb->query( $query );
 	}
 
-
 	// Delete user data
 	public function delete_user_data( $id_user ): \mysqli_result|bool|int|null {
 		$sql = $this->wpdb->prepare( "DELETE FROM $this->table_user_data WHERE user_id = %d", $id_user );
 
 		return $this->wpdb->query( $sql );
 	}
+
+
+	public function synchronize_user_meta():void{
+
+		$this->truncate_table_user_data();
+
+		$sql ="
+				INSERT INTO wp_dcms_user_data
+				SELECT user_id,
+                    GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'number' THEN meta_value END) as 'number',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'reference' THEN meta_value END) as 'reference',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'nif' THEN meta_value END) as 'nif',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'first_name' THEN meta_value END) as 'name',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'lastname' THEN meta_value END) as 'lastname',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'birth' THEN meta_value END) as 'birth',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_type' THEN meta_value END) as 'sub_type',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'address' THEN meta_value END) as 'address',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'postal_code' THEN meta_value END) as 'postal_code',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'local' THEN meta_value END) as 'local',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as 'email',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as 'phone',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as 'mobile',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation_person' THEN meta_value END) as 'observation_person',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'roles' THEN meta_value END) as 'roles'
+                FROM
+                    $this->table_meta WHERE
+                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
+                                'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
+                                'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person', 'roles')
+                GROUP BY user_id
+                HAVING MAX(CASE WHEN meta_key = 'number' THEN meta_value END) <> ''";
+
+
+		$this->wpdb->query( $sql );
+	}
 }
+
+
+// Optimization, create View
+//	public function create_view() {
+//		$sql = "CREATE OR REPLACE VIEW {$this->view_users} AS
+//                SELECT user_id,
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'pin' THEN meta_value END) as 'pin',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'number' THEN meta_value END) as 'number',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'reference' THEN meta_value END) as 'reference',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'nif' THEN meta_value END) as 'nif',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'first_name' THEN meta_value END) as 'name',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'lastname' THEN meta_value END) as 'lastname',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'birth' THEN meta_value END) as 'birth',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_type' THEN meta_value END) as 'sub_type',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'address' THEN meta_value END) as 'address',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'postal_code' THEN meta_value END) as 'postal_code',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'local' THEN meta_value END) as 'local',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as 'email',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as 'phone',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as 'mobile',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'observation_person' THEN meta_value END) as 'observation_person',
+//                    GROUP_CONCAT(CASE WHEN meta_key = 'roles' THEN meta_value END) as 'roles'
+//                FROM
+//                    {$this->table_meta} WHERE
+//                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
+//                                'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
+//                                'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person', 'roles')
+//                GROUP BY user_id";
+//
+//		$result = $this->wpdb->query( $sql );
+//		if ( $result === false ) {
+//			error_log( 'Error al crear vista: ' . $this->wpdb->last_error );
+//		}
+//
+//		return $result;
+//	}
