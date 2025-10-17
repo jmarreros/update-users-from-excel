@@ -12,9 +12,11 @@ class Profile {
 
 		add_action( 'personal_options_update', [ $this, 'save_custom_section' ], 100, 20 );
 		add_action( 'edit_user_profile_update', [ $this, 'save_custom_section' ], 100, 20 );
+
+		add_action ('delete_user', [ $this, 'delete_user_data' ], 10, 1);
 	}
 
-	// Add custom section
+	// Add a custom section
 	public function add_custom_section( $user ): void {
 		include_once( DCMS_UPDATE_PATH . '/views/profile.php' );
 	}
@@ -54,6 +56,11 @@ class Profile {
 			$db = new Database();
 			$db->insert_or_update_user_data( $user_id, $user_meta );
 		}
+	}
 
+	// Delete user data on user deletion
+	public function delete_user_data( $user_id ): void {
+		$db = new Database();
+		$db->delete_user_data( $user_id );
 	}
 }
