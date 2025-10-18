@@ -16,16 +16,23 @@ final class Helper {
 			'birth'              => 'Fecha Nacimiento',
 			'sub_type'           => 'Tipo de Abono',
 			'address'            => 'Domicilio Completo',
+			'country'            => 'País',
 			'postal_code'        => 'Código Postal',
 			'local'              => 'Localidad',
+			'zone'               => 'ID Zona Abono',
+			'ayuntamiento'       => 'Ayuntamiento',
 			'email'              => 'E-MAIL',
 			'phone'              => 'Teléfono',
 			'mobile'             => 'Teléfono Móvil',
 			'soc_type'           => 'Tipo de Socio',
 			'observation7'       => 'Observa 7',
 			'observation5'       => 'Observa 5',
+			'observation10'      => 'Observa 10',
+			'observation11'      => 'Observa 11',
+			'observation19'      => 'Observa 19',
 			'sub_permit'         => 'Permiso Abono',
 			'observation_person' => 'Observaciones Persona',
+			'date_register'      => 'Fecha Alta',
 			'roles'              => 'Roles', // User roles separated by comma
 		];
 	}

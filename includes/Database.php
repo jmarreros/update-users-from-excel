@@ -65,14 +65,21 @@ class Database {
                     `address` varchar(250) DEFAULT NULL,
                     `postal_code` varchar(50) DEFAULT NULL,
                     `local` varchar(100) DEFAULT NULL,
+                    `country` varchar(100) DEFAULT NULL,
+                    `ayuntamiento` varchar(100) DEFAULT NULL,   
+                    `zone` varchar(100) DEFAULT NULL,
                     `email` varchar(100) DEFAULT NULL,
                     `phone` varchar(50) DEFAULT NULL,
                     `mobile` varchar(50) DEFAULT NULL,
                     `soc_type` varchar(50) DEFAULT NULL,
                     `observation7` varchar(250) DEFAULT NULL,
                     `observation5` varchar(250) DEFAULT NULL,
+                    `observation10` varchar(250) DEFAULT NULL,
+                    `observation11` varchar(250) DEFAULT NULL,
+                    `observation19` varchar(250) DEFAULT NULL,
                     `sub_permit`  varchar(100) DEFAULT NULL,
                     `observation_person`  varchar(100) DEFAULT NULL,
+                    `date_register` datetime DEFAULT NULL,
                     `roles` varchar(250) DEFAULT NULL";
 
 
@@ -118,8 +125,8 @@ class Database {
 		$sql = "DROP TABLE IF EXISTS $this->table_tmp_import";
 		$this->wpdb->query( $sql );
 
-		$sql = "DROP TABLE IF EXISTS $this->table_user_data";
-		$this->wpdb->query( $sql );
+//		$sql = "DROP TABLE IF EXISTS $this->table_user_data";
+//		$this->wpdb->query( $sql );
 	}
 
 
@@ -205,21 +212,29 @@ class Database {
                     GROUP_CONCAT(CASE WHEN meta_key = 'sub_type' THEN meta_value END) as 'sub_type',
                     GROUP_CONCAT(CASE WHEN meta_key = 'address' THEN meta_value END) as 'address',
                     GROUP_CONCAT(CASE WHEN meta_key = 'postal_code' THEN meta_value END) as 'postal_code',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'country' THEN meta_value END) as 'country',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'ayuntamiento' THEN meta_value END) as 'ayuntamiento',
                     GROUP_CONCAT(CASE WHEN meta_key = 'local' THEN meta_value END) as 'local',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'zone' THEN meta_value END) as 'zone',
                     GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as 'email',
                     GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as 'phone',
                     GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as 'mobile',
                     GROUP_CONCAT(CASE WHEN meta_key = 'soc_type' THEN meta_value END) as 'soc_type',
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation7' THEN meta_value END) as 'observation7',
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation5' THEN meta_value END) as 'observation5',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation10' THEN meta_value END) as 'observation10',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation11' THEN meta_value END) as 'observation11',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'observation19' THEN meta_value END) as 'observation19',
                     GROUP_CONCAT(CASE WHEN meta_key = 'sub_permit' THEN meta_value END) as 'sub_permit',
                     GROUP_CONCAT(CASE WHEN meta_key = 'observation_person' THEN meta_value END) as 'observation_person',
+                    GROUP_CONCAT(CASE WHEN meta_key = 'date_register' THEN meta_value END) as 'date_register',
                     GROUP_CONCAT(CASE WHEN meta_key = 'roles' THEN meta_value END) as 'roles'
                 FROM
                     $this->table_meta WHERE
-                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname',
-                                'birth', 'sub_type', 'address', 'postal_code', 'local', 'email', 'phone', 'mobile',
-                                'soc_type', 'observation7', 'observation5', 'sub_permit', 'observation_person', 'roles')
+                    meta_key in ('identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname', 'birth', 'sub_type', 
+                                 'address', 'postal_code', 'local', 'country', 'ayuntamiento', 'email', 'phone', 'mobile', 'zone', 
+                                 'soc_type', 'observation7', 'observation5','observation10','observation11','observation19', 
+                                 'sub_permit', 'observation_person','date_register', 'roles')
                 GROUP BY user_id
                 HAVING MAX(CASE WHEN meta_key = 'number' THEN meta_value END) <> ''";
 
