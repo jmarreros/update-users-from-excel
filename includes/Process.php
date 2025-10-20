@@ -40,6 +40,10 @@ class Process {
 			// Insert or update custom user data table
 			if ( $id_user ) {
 				$user_data = $this->get_user_data( $item );
+
+				$final_roles        = UserRoles::add_roles_to_item( $item );
+				$user_data['roles'] = implode( ', ', $final_roles );
+
 				$db->insert_or_update_user_data( $id_user, $user_data );
 			}
 		}
@@ -120,7 +124,11 @@ class Process {
 			}
 
 			if ( $key === 'roles' ) {
-				UserRoles::update_custom_roles( $id_user, $item->roles );
+				$roles = UserRoles::update_custom_roles( $id_user, $item );
+				error_log(print_r('Roles $roles:',true));
+				error_log(print_r( $roles,true));
+
+				update_user_meta( $id_user, 'roles', $roles );
 			}
 		}
 	}

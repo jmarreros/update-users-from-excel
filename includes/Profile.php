@@ -41,13 +41,7 @@ class Profile {
 
 		// For roles y user data table
 		$roles             = $_POST['dcms_user_roles'] ?? [];
-		$final_roles       = '';
-
-		if ( defined( 'DCMS_CUSTOMAREA_ROLES' ) ) {
-			$intercepted_roles = array_intersect( $roles, DCMS_CUSTOMAREA_ROLES ?? [] );
-			$transformed_roles = transform_custom_roles( $intercepted_roles );
-			$final_roles       = implode( ', ', $transformed_roles );
-		}
+		$final_roles      = UserRoles::build_custom_roles( $roles );
 
 		$user_meta['roles'] = $final_roles;
 

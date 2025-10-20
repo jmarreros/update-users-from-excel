@@ -14,7 +14,7 @@ final class Helper {
 			'name'               => 'Nombre',
 			'lastname'           => 'Apellidos',
 			'birth'              => 'Fecha Nacimiento',
-			'sub_type'           => 'Tipo de Abono',
+			'sub_type'           => 'Tipo de Abono', // Define Rol: Tipo Abono
 			'address'            => 'Domicilio Completo',
 			'country'            => 'País',
 			'postal_code'        => 'Código Postal',
@@ -24,16 +24,16 @@ final class Helper {
 			'email'              => 'E-MAIL',
 			'phone'              => 'Teléfono',
 			'mobile'             => 'Teléfono Móvil',
-			'soc_type'           => 'Tipo de Socio',
-			'observation7'       => 'Observa 7',
+			'soc_type'           => 'Tipo de Socio', // Define Rol: Tipo de Socio
+			'observation7'       => 'Observa 7', // Define Rol indirectamente - Asistencia partidos
 			'observation5'       => 'Observa 5',
 			'observation10'      => 'Observa 10',
-			'observation11'      => 'Observa 11',
+			'observation11'      => 'Observa 11', // Define Rol: Localización
 			'observation19'      => 'Observa 19',
 			'sub_permit'         => 'Permiso Abono',
-			'observation_person' => 'Observaciones Persona',
+			'observation_person' => 'Observaciones Persona', // Define Role: Antigüedad
 			'date_register'      => 'Fecha Alta',
-			'roles'              => 'Roles', // User roles separated by comma
+			'roles'              => 'Roles', // Consolidado de roles separados por comas
 		];
 	}
 
