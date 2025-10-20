@@ -41,7 +41,7 @@ class Profile {
 
 		// For roles y user data table
 		$roles             = $_POST['dcms_user_roles'] ?? [];
-		$final_roles      = UserRoles::build_custom_roles( $roles );
+		$final_roles      = UserRoles::get_valid_custom_roles( $roles );
 
 		$user_meta['roles'] = $final_roles;
 

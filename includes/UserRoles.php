@@ -73,13 +73,12 @@ class UserRoles {
 
 
 	// Validate roles and build roles in a string format
-	public static function build_custom_roles( $current_roles ): string {
+	public static function get_valid_custom_roles( $current_roles ): string {
 		$final_roles = '';
 
 		if ( defined( 'DCMS_CUSTOMAREA_ROLES' ) ) {
 			$intercepted_roles = array_intersect( $current_roles, DCMS_CUSTOMAREA_ROLES ?? [] );
-			$transformed_roles = transform_custom_roles( $intercepted_roles );
-			$final_roles       = implode( ', ', $transformed_roles );
+			$final_roles       = implode( ', ', $intercepted_roles );
 		}
 
 		return $final_roles;
