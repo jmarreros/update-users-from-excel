@@ -2,7 +2,6 @@
 
 namespace dcms\update\includes;
 
-use dcms\update\includes\Database;
 use dcms\update\helpers\Helper;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -43,11 +42,16 @@ class Export{
             foreach ($fields as $key => $value) {
                 if ( $user->$key <> '' ){
                     $content = $user->$key;
-                    $sheet->setCellValueByColumnAndRow($icol, $irow, $content);
+
+					if ( $key === 'roles'){
+						$content = format_string_uppercase( $user->roles );
+					}
+
+	                $sheet->setCellValueByColumnAndRow($icol, $irow, $content);
                 }
                 $icol++;
             }
-
+			
             $irow++;
         }
 

@@ -72,7 +72,7 @@ final class Loader {
 	}
 
 	// Initialize all
-	public function init() {
+	public function init(): void {
 		$this->define_constants();
 		$this->load_domain();
 		$this->add_link_plugin();
