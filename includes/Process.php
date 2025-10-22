@@ -125,8 +125,6 @@ class Process {
 
 			if ( $key === 'roles' ) {
 				$roles = UserRoles::update_custom_roles( $id_user, $item );
-				error_log(print_r('Roles $roles:',true));
-				error_log(print_r( $roles,true));
 
 				update_user_meta( $id_user, 'roles', $roles );
 			}
