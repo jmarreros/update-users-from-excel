@@ -44,6 +44,10 @@ class UserRoles {
 	public static function add_roles_to_item( $item ): array {
 		$roles_arr = [];
 
+		if ( ! defined( 'DCMS_CUSTOMAREA_ROLES' ) || ! defined( 'DCMS_CUSTOMAREA_ROLES_LEALTAD' ) ) {
+			return $roles_arr;
+		}
+
 		// Procesar la columna roles ya que puede contener varios roles separados por comas
 		if ( ! empty( $item->roles ) ) {
 			$parts = array_map( 'trim', explode( ',', (string) $item->roles ) );
@@ -73,9 +77,9 @@ class UserRoles {
 		// Procesar el campo observa7 para asignar roles de lealtad según el porcentaje
 		$observa7 = trim( $item->observation7 ?? '' );
 
-		if ( $observa7 !== ''){
+		if ( $observa7 !== '' ) {
 			// Puede ser un número o número con %, solo quedarse con el número, ejemplo 100, 100%, 85, 85%
-			$observa7 = rtrim( $observa7, '%' );
+//			$observa7 = rtrim( $observa7, '%' );
 			if ( is_numeric( $observa7 ) ) {
 
 				// Quitar los roles de lealtad si existen en el array
@@ -84,9 +88,9 @@ class UserRoles {
 				} );
 
 				$observa7 = floatval( $observa7 );
-				if ( $observa7 >= 100 ) {
+				if ( $observa7 >= 1 ) {
 					$roles_arr[] = 'nivel_dorado';
-				} elseif ( $observa7 >= 90 ) {
+				} elseif ( $observa7 >= 0.9 ) {
 					$roles_arr[] = 'nivel_rojiblanco';
 				} else {
 					$roles_arr[] = 'nivel_general';
@@ -94,7 +98,7 @@ class UserRoles {
 			}
 		}
 
-		return array_intersect( $roles_arr, DCMS_CUSTOMAREA_ROLES);
+		return array_intersect( $roles_arr, DCMS_CUSTOMAREA_ROLES );
 	}
 
 
