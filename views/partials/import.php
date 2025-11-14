@@ -11,8 +11,14 @@
             <div>
                 <span>Selecciona el archivo xls: </span>
                 <input type="file" id="file" name="upload-file"/>
+                <br>
+                <br>
+                <label>
+                <input type="checkbox" id="delete-users" name="delete-users" />
+                    Eliminar usuarios no presentes en el archivo al procesar la importación
+                </label>
             </div>
-            <input class="button button-primary" type="submit" id="submit" value="Enviar archivo"/>
+            <input class="button button-primary" type="submit" id="submit" value="Importar usuarios"/>
         </form>
 
     </section>

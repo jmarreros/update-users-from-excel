@@ -15,8 +15,8 @@ class Submenu{
     public function register_submenu(){
         add_submenu_page(
             DCMS_UPDATE_SUBMENU,
-            __('Importar Usuarios','dcms-update-users-excel'),
-            __('Importar Usuarios','dcms-update-users-excel'),
+            __('Gestión Usuarios','dcms-update-users-excel'),
+            __('Gestión Usuarios','dcms-update-users-excel'),
             'manage_options',
             'update-users-excel',
             [$this, 'submenu_page_callback']

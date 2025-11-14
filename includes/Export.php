@@ -44,7 +44,7 @@ class Export{
                     $content = $user->$key;
 
 					if ( $key === 'roles'){
-						$content = format_string_uppercase( $user->roles );
+						$content = mb_strtoupper( str_replace( '_', ' ', $user->roles ), 'UTF-8' );
 					}
 
 	                $sheet->setCellValueByColumnAndRow($icol, $irow, $content);
