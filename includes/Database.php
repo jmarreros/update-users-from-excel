@@ -30,7 +30,8 @@ class Database {
 
 		$sql = "SELECT *, u.id user_id FROM $this->table_tmp_import uu
                 LEFT JOIN $table_user u ON uu.identify = u.user_login
-                WHERE uu.excluded = 0";
+                WHERE uu.excluded = 0
+                ORDER BY uu.id ASC";
 
 		if ( $limit > 0 ) {
 			$sql .= $this->wpdb->prepare(" LIMIT %d OFFSET %d", $limit, $offset);
