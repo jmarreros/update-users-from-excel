@@ -25,15 +25,15 @@ class Database {
 	}
 
 	// Get unprocessed users from the log table in batch
-	public function get_import_users_by_batch( $limit = 0 ): array|object|null {
+	public function get_import_users_by_batch( $limit = 0, $offset = 0 ): array|object|null {
 		$table_user = $this->wpdb->prefix . "users";
 
 		$sql = "SELECT *, u.id user_id FROM $this->table_tmp_import uu
                 LEFT JOIN $table_user u ON uu.identify = u.user_login
-                WHERE uu.date_update IS NULL AND uu.excluded = 0";
+                WHERE uu.excluded = 0";
 
 		if ( $limit > 0 ) {
-			$sql .= " LIMIT $limit";
+			$sql .= $this->wpdb->prepare(" LIMIT %d OFFSET %d", $limit, $offset);
 		}
 
 		return $this->wpdb->get_results( $sql );
@@ -193,12 +193,48 @@ class Database {
 		return $this->wpdb->query( $sql );
 	}
 
+	public function delete_user_not_imported(): void {
+		$users_table      = $this->wpdb->users;
+		$usermeta_table   = $this->wpdb->usermeta;
+		$user_data_table  = $this->table_user_data;
+		$tmp_import_table = $this->table_tmp_import;
+		$capabilities_key = $this->wpdb->prefix . 'capabilities';
+		$temp_delete_table = 'temp_users_to_delete';
 
-	public function synchronize_user_meta():void{
+		// 1. Crear una tabla temporal para almacenar los IDs de los usuarios a eliminar.
+		$this->wpdb->query("CREATE TEMPORARY TABLE {$temp_delete_table} (user_id BIGINT(20) NOT NULL, PRIMARY KEY (user_id))");
+
+		// 2. Identificar y guardar los IDs de los usuarios que no son administradores y no están en la importación.
+		$sql_select_ids = $this->wpdb->prepare(
+			"INSERT INTO {$temp_delete_table} (user_id)
+         SELECT u.ID
+         FROM {$users_table} u
+         LEFT JOIN {$usermeta_table} um ON u.ID = um.user_id AND um.meta_key = %s AND um.meta_value LIKE %s
+         WHERE
+             u.user_login NOT IN (SELECT identify FROM {$tmp_import_table} WHERE identify IS NOT NULL AND identify <> '')
+             AND um.user_id IS NULL", // um.user_id será NULL si el usuario no es administrador
+			$capabilities_key,
+			'%administrator%'
+		);
+
+		$this->wpdb->query($sql_select_ids);
+
+		// 3. Eliminar los registros de las tablas correspondientes usando la tabla temporal.
+		// Se usa JOIN para un borrado más eficiente.
+		$this->wpdb->query("DELETE ud FROM {$user_data_table} ud JOIN {$temp_delete_table} tmp ON ud.user_id = tmp.user_id");
+		$this->wpdb->query("DELETE um FROM {$usermeta_table} um JOIN {$temp_delete_table} tmp ON um.user_id = tmp.user_id");
+		$this->wpdb->query("DELETE u FROM {$users_table} u JOIN {$temp_delete_table} tmp ON u.ID = tmp.user_id");
+
+		// 4. Eliminar la tabla temporal.
+		$this->wpdb->query("DROP TEMPORARY TABLE IF EXISTS {$temp_delete_table}");
+	}
+
+
+	public function synchronize_user_meta(): void {
 
 		$this->truncate_table_user_data();
 
-		$sql ="
+		$sql = "
 				INSERT INTO wp_dcms_user_data
 				SELECT user_id,
                     GROUP_CONCAT(CASE WHEN meta_key = 'identify' THEN meta_value END) as 'identify',

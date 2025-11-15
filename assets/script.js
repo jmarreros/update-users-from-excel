@@ -30,10 +30,16 @@
             processData: false,
             beforeSend: function () {
                 $('.process-info').removeClass('processing').html('<span>Enviando...</span>');
+                $('#form-upload').find('input, button').attr('disabled', true);
+                $('#submit-export').attr('disabled', true);
             },
             success: function (res) {
                 $('.process-info').html('<span>' + res.message + '</span>');
                 process_upload(1);
+            },
+            complete: function () {
+                $('#form-upload').find('input, button').attr('disabled', false);
+                $('#submit-export').attr('disabled', false);
             }
         });
 
@@ -57,24 +63,34 @@
                 nonce: update_users_vars.ajaxnonce,
                 total,
                 step,
+                delete: $('#delete-users').is(':checked') ? 1 : 0
             },
             dataType: 'json',
             success: function (res) {
                 if (res.status === 0) {
-                    $('.process-info').addClass('processing').html(`<span>Procesados ${res.count} de ${res.total}
-                                            <br> Lote: ${res.step} de ${Math.round(res.total / res.batch)}</span>`);
-                    process_upload(res.step, res.total)
+                    // Calcula el número de lotes estimados de forma más precisa
+                    const totalBatches = Math.ceil(res.total / res.batch);
+                    const percentage = Math.round((res.count / res.total) * 100);
+
+                    $('.process-info').addClass('processing').html(
+                        `<span>Procesados ${res.count} de ${res.total} (${percentage}%)
+                        <br> Lote: ${res.step} de ${totalBatches}</span>`
+                    );
+
+                    process_upload(res.step, res.total);
                 } else {
-                    if ( res.count_errors > 0 ) {
+                    if (res.count_errors > 0) {
                         $('.process-info').html('<span>Hubo ' + res.count_errors + ' error(es) al realizar la importación</span>');
-                    } else{
+                    } else {
                         $('.process-info').removeClass('processing').html('<span>Importación finalizada</span>');
                         $('#file').val('');
                     }
-
                 }
+            },
+            error: function(xhr, status, error) {
+                $('.process-info').removeClass('processing').html('<span>Error en el procesamiento: ' + error + '</span>');
+                console.error('Error AJAX:', xhr.responseText);
             }
-
         });
     }
 

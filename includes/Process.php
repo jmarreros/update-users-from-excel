@@ -25,11 +25,15 @@ class Process {
 		$this->path_file = $content_directory . DCMS_UPDATE_FILE_NAME_IMPORT;
 	}
 
+	public function process_delete_users(): void {
+		$db = new Database();
+		$db->delete_user_not_imported();
+	}
 
 	// Automatic process import users, create or update
-	public function process_import_data(): void {
+	public function process_import_data(int $offset = 0): void {
 		$db    = new Database();
-		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS );
+		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS, $offset );
 
 		add_filter( 'send_email_change_email', '__return_false' );
 
@@ -238,43 +242,48 @@ class Process {
 	public function process_batch_ajax(): void {
 		$batch        = DCMS_UPDATE_COUNT_BATCH_PROCESS;
 		$total        = $_REQUEST['total'] ?? false;
-		$step         = $_REQUEST['step'] ?? 0;
-		$count        = $step * $batch;
+		$step         = $_REQUEST['step'] ?? 1; // Inicia en 1 por defecto
+		$delete_users = isset($_REQUEST['delete']) && $_REQUEST['delete'];
+		$count        = ($step - 1) * $batch; // Calcula los procesados hasta el paso anterior
 		$status       = 0;
 		$count_errors = 0;
 
-		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
-			error_log( 'Error de Nonce!' );
-
+		if (!wp_verify_nonce($_REQUEST['nonce'], 'update-users-nonce')) {
+			error_log('Error de Nonce!');
 			return;
 		}
 
-		$step ++;
-
-		// Get the total
-		if ( ! $total ) {
+		// Obtener el total en el primer paso
+		if (!$total) {
 			$total = $this->get_total_import_users();
 		}
 
-		// Comprobamos la finalización
-		if ( $count > $total ) {
+		// Comprobar si se ha completado antes de procesar
+		if ($count >= $total && $total > 0) {
 			$status       = 1;
 			$count_errors = $this->count_excluded_items();
+
+			// Eliminar usuarios no presentes en el archivo
+			if ($delete_users) {
+				$this->process_delete_users();
+			}
+		} else {
+			// Calcular el offset basado en el paso actual
+			$offset = ($step - 1) * $batch;
+			$this->process_import_data($offset);
 		}
 
-		$this->process_import_data();
-
-		// Construimos la respuesta
+		// Construir la respuesta
 		$res = [
 			'status'       => $status,
-			'step'         => $step,
-			'count'        => $count,
+			'step'         => $step + 1, // Enviar el siguiente paso a procesar
+			'count'        => min($step * $batch, $total), // Actualizar el contador para la respuesta
 			'batch'        => $batch,
 			'total'        => $total,
 			'count_errors' => $count_errors,
 		];
 
-		echo json_encode( $res );
+		echo json_encode($res);
 		wp_die();
 	}
 
