@@ -2,6 +2,8 @@
 
 namespace dcms\update\includes;
 
+use dcms\update\helpers\Helper;
+
 class Database {
 	private \wpdb $wpdb;
 	private string $table_tmp_import;
@@ -163,6 +165,11 @@ class Database {
 		$user_data['user_id'] = $id_user;
 
 		$table = $this->table_user_data;
+
+		$fields = Helper::get_config_fields();
+		$all_field_keys = array_keys($fields);
+		$default_data = array_fill_keys($all_field_keys, null);
+		$user_data = array_merge($default_data, $user_data);
 
 		// Prepara las columnas y los marcadores de posición para la parte INSERT
 		$columns      = '`' . implode( '`, `', array_keys( $user_data ) ) . '`';

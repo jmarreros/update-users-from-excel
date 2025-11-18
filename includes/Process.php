@@ -31,7 +31,7 @@ class Process {
 	}
 
 	// Automatic process import users, create or update
-	public function process_import_data(int $offset = 0): void {
+	public function process_import_data( int $offset = 0 ): void {
 		$db    = new Database();
 		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS, $offset );
 
@@ -123,9 +123,7 @@ class Process {
 		$fields = Helper::get_config_fields();
 
 		foreach ( $fields as $key => $value ) {
-			if ( ! is_null( $item->{$key} ) ) { // Validate for a value for updating
-				update_user_meta( $id_user, $key, $item->{$key} );
-			}
+			update_user_meta( $id_user, $key, $item->{$key} );
 
 			if ( $key === 'roles' ) {
 				$roles = UserRoles::update_custom_roles( $id_user, $item );
@@ -243,47 +241,48 @@ class Process {
 		$batch        = DCMS_UPDATE_COUNT_BATCH_PROCESS;
 		$total        = $_REQUEST['total'] ?? false;
 		$step         = $_REQUEST['step'] ?? 1; // Inicia en 1 por defecto
-		$delete_users = isset($_REQUEST['delete']) && $_REQUEST['delete'];
-		$count        = ($step - 1) * $batch; // Calcula los procesados hasta el paso anterior
+		$delete_users = isset( $_REQUEST['delete'] ) && $_REQUEST['delete'];
+		$count        = ( $step - 1 ) * $batch; // Calcula los procesados hasta el paso anterior
 		$status       = 0;
 		$count_errors = 0;
 
-		if (!wp_verify_nonce($_REQUEST['nonce'], 'update-users-nonce')) {
-			error_log('Error de Nonce!');
+		if ( ! wp_verify_nonce( $_REQUEST['nonce'], 'update-users-nonce' ) ) {
+			error_log( 'Error de Nonce!' );
+
 			return;
 		}
 
 		// Obtener el total en el primer paso
-		if (!$total) {
+		if ( ! $total ) {
 			$total = $this->get_total_import_users();
 		}
 
 		// Comprobar si se ha completado antes de procesar
-		if ($count >= $total && $total > 0) {
+		if ( $count >= $total && $total > 0 ) {
 			$status       = 1;
 			$count_errors = $this->count_excluded_items();
 
 			// Eliminar usuarios no presentes en el archivo
-			if ($delete_users) {
+			if ( $delete_users ) {
 				$this->process_delete_users();
 			}
 		} else {
 			// Calcular el offset basado en el paso actual
-			$offset = ($step - 1) * $batch;
-			$this->process_import_data($offset);
+			$offset = ( $step - 1 ) * $batch;
+			$this->process_import_data( $offset );
 		}
 
 		// Construir la respuesta
 		$res = [
 			'status'       => $status,
 			'step'         => $step + 1, // Enviar el siguiente paso a procesar
-			'count'        => min($step * $batch, $total), // Actualizar el contador para la respuesta
+			'count'        => min( $step * $batch, $total ), // Actualizar el contador para la respuesta
 			'batch'        => $batch,
 			'total'        => $total,
 			'count_errors' => $count_errors,
 		];
 
-		echo json_encode($res);
+		echo json_encode( $res );
 		wp_die();
 	}
 
