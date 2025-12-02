@@ -71,6 +71,7 @@ class Database {
                     `country` varchar(100) DEFAULT NULL,
                     `ayuntamiento` varchar(100) DEFAULT NULL,   
                     `zone` varchar(100) DEFAULT NULL,
+                    `provincia` varchar(100) DEFAULT NULL,
                     `email` varchar(100) DEFAULT NULL,
                     `phone` varchar(50) DEFAULT NULL,
                     `mobile` varchar(50) DEFAULT NULL,
@@ -87,13 +88,14 @@ class Database {
 
 
 		// Create a temp import table
-		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS {$this->table_tmp_import} (
+		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS $this->table_tmp_import (
      				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
                     $common_fields,
                     `date_update` datetime DEFAULT NULL,
                     `user_id` bigint(20) DEFAULT NULL,
                     `excluded` tinyint(1) DEFAULT '0',
-                    PRIMARY KEY (`id`)
+                    PRIMARY KEY (`id`),
+                	UNIQUE KEY `identify` (`identify`)
           )";
 
 		dbDelta( $sql_tmp_import );
@@ -102,7 +104,8 @@ class Database {
 		$sql_user_data = " CREATE TABLE IF NOT EXISTS $this->table_user_data (
      				`user_id` bigint(20) unsigned NOT NULL,
                     $common_fields,
-                    PRIMARY KEY (`user_id`)
+                    PRIMARY KEY (`user_id`),
+                    UNIQUE KEY `identify` (`identify`)
           )";
 
 		dbDelta( $sql_user_data );
@@ -192,9 +195,6 @@ class Database {
 		// Prepara y ejecuta la consulta
 		$query = $this->wpdb->prepare( $sql, array_values( $user_data ) );
 
-		error_log(print_r('Consulta',true));
-		error_log(print_r($query,true));
-
 		return $this->wpdb->query( $query );
 	}
 
@@ -249,7 +249,7 @@ class Database {
 		$sql = "
 		    INSERT INTO $this->table_user_data (
 		        user_id, identify, pin, number, reference, nif, name, lastname, birth,
-		        sub_type, address, postal_code, local, country, ayuntamiento, zone, email,
+		        sub_type, address, postal_code, local, country, ayuntamiento, zone, provincia, email,
 		        phone, mobile, soc_type, observation7, observation5, observation10,
 		        observation11, observation19, sub_permit, observation_person, date_register, roles
 		    )
@@ -270,6 +270,7 @@ class Database {
 		        GROUP_CONCAT(CASE WHEN meta_key = 'country' THEN meta_value END) as country,
 		        GROUP_CONCAT(CASE WHEN meta_key = 'ayuntamiento' THEN meta_value END) as ayuntamiento,
 		        GROUP_CONCAT(CASE WHEN meta_key = 'zone' THEN meta_value END) as zone,
+		        GROUP_CONCAT(CASE WHEN meta_key = 'provincia' THEN meta_value END) as provincia,
 		        GROUP_CONCAT(CASE WHEN meta_key = 'email' THEN meta_value END) as email,
 		        GROUP_CONCAT(CASE WHEN meta_key = 'phone' THEN meta_value END) as phone,
 		        GROUP_CONCAT(CASE WHEN meta_key = 'mobile' THEN meta_value END) as mobile,
@@ -288,7 +289,7 @@ class Database {
 		    WHERE
 		        meta_key IN (
 		            'identify', 'pin', 'number', 'reference', 'nif', 'first_name', 'lastname', 'birth',
-		            'sub_type', 'address', 'postal_code', 'local', 'country', 'ayuntamiento', 'zone',
+		            'sub_type', 'address', 'postal_code', 'local', 'country', 'ayuntamiento', 'zone', 'provincia',
 		            'email', 'phone', 'mobile', 'soc_type', 'observation7', 'observation5',
 		            'observation10', 'observation11', 'observation19', 'sub_permit', 'observation_person',
 		            'date_register', 'roles'

@@ -17,6 +17,7 @@ final class Helper {
 			'sub_type'           => 'Tipo de Abono', // Define Rol: Tipo Abono
 			'address'            => 'Domicilio Completo',
 			'country'            => 'País',
+			'provincia'          => 'Provincia',
 			'postal_code'        => 'Código Postal',
 			'local'              => 'Localidad',
 			'zone'               => 'ID Zona Abono',

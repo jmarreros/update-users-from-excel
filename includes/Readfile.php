@@ -13,7 +13,7 @@ class Readfile {
 	public function __construct( $path_file ) {
 		$options = get_option( 'dcms_user_excel_options' );
 
-		$this->path_file    =  $path_file;
+		$this->path_file    = $path_file;
 		$this->sheet_number = $options['dcms_usexcel_sheet_field'];
 
 		if ( file_exists( $this->path_file ) ) {
@@ -58,7 +58,7 @@ class Readfile {
 
 		foreach ( $config_fields as $key => $value ) {
 
-			$text = $options["dcms_usexcel_${key}_field"];
+			$text = $options["dcms_usexcel_${key}_field"] ?? '';
 
 			$found              = array_search( $text, $headers );
 			$headers_id[ $key ] = ( ! empty( $text ) && $found !== false ) ? $found : - 1;
