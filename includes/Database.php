@@ -27,20 +27,24 @@ class Database {
 	}
 
 	// Get unprocessed users from the log table in batch
-	public function get_import_users_by_batch( $limit = 0, $offset = 0 ): array|object|null {
+	public function get_import_users_by_batch( int $limit = 0, int $last_id = 0 ): array|object|null {
 		$table_user = $this->wpdb->prefix . "users";
 
-		$sql = "SELECT *, u.id user_id FROM $this->table_tmp_import uu
-                LEFT JOIN $table_user u ON uu.identify = u.user_login
-                WHERE uu.excluded = 0
-                ORDER BY uu.id ASC";
+		$sql = $this->wpdb->prepare(
+			"SELECT *, u.id user_id FROM $this->table_tmp_import uu
+             LEFT JOIN $table_user u ON uu.identify = u.user_login
+             WHERE uu.excluded = 0 AND uu.id > %d
+             ORDER BY uu.id ASC",
+			$last_id
+		);
 
 		if ( $limit > 0 ) {
-			$sql .= $this->wpdb->prepare( " LIMIT %d OFFSET %d", $limit, $offset );
+			$sql .= $this->wpdb->prepare( " LIMIT %d", $limit );
 		}
 
 		return $this->wpdb->get_results( $sql );
 	}
+
 
 	//Get total import users
 	public function get_total_import_users(): int {
@@ -69,7 +73,7 @@ class Database {
                     `postal_code` varchar(50) DEFAULT NULL,
                     `local` varchar(100) DEFAULT NULL,
                     `country` varchar(100) DEFAULT NULL,
-                    `ayuntamiento` varchar(100) DEFAULT NULL,   
+                    `ayuntamiento` varchar(100) DEFAULT NULL,
                     `zone` varchar(100) DEFAULT NULL,
                     `provincia` varchar(100) DEFAULT NULL,
                     `email` varchar(100) DEFAULT NULL,
@@ -89,24 +93,25 @@ class Database {
 
 		// Create a temp import table
 		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS $this->table_tmp_import (
-     				`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-                    $common_fields,
-                    `date_update` datetime DEFAULT NULL,
-                    `user_id` bigint(20) DEFAULT NULL,
-                    `excluded` tinyint(1) DEFAULT '0',
-                    PRIMARY KEY (`id`),
-                	UNIQUE KEY `identify` (`identify`)
-          )";
+			 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+						$common_fields,
+						`date_update` datetime DEFAULT NULL,
+						`user_id` bigint(20) DEFAULT NULL,
+						`excluded` tinyint(1) DEFAULT '0',
+						PRIMARY KEY (`id`),
+					 UNIQUE KEY `identify` (`identify`),
+					 KEY `excluded_idx` (`excluded`)
+			  )";
 
 		dbDelta( $sql_tmp_import );
 
 		// Create a user data table
 		$sql_user_data = " CREATE TABLE IF NOT EXISTS $this->table_user_data (
-     				`user_id` bigint(20) unsigned NOT NULL,
-                    $common_fields,
-                    PRIMARY KEY (`user_id`),
-                    UNIQUE KEY `identify` (`identify`)
-          )";
+			 `user_id` bigint(20) unsigned NOT NULL,
+						$common_fields,
+						PRIMARY KEY (`user_id`),
+						UNIQUE KEY `identify` (`identify`)
+			  )";
 
 		dbDelta( $sql_user_data );
 	}

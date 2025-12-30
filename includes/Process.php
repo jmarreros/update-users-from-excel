@@ -31,12 +31,17 @@ class Process {
 	}
 
 	// Automatic process import users, create or update
-	public function process_import_data( int $offset = 0 ): void {
+	public function process_import_data( int $last_id = 0 ): int {
 		$db    = new Database();
-		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS, $offset );
+		$items = $db->get_import_users_by_batch( DCMS_UPDATE_COUNT_BATCH_PROCESS, $last_id );
+
+		if ( empty( $items ) ) {
+			return $last_id;
+		}
 
 		add_filter( 'send_email_change_email', '__return_false' );
 
+		$current_last_id = $last_id;
 		foreach ( $items as $item ) {
 			// Insert or update a user and metadata
 			$id_user = $this->save_import_user( $item );
@@ -50,8 +55,11 @@ class Process {
 
 				$db->insert_or_update_user_data( $id_user, $user_data );
 			}
+			$current_last_id = $item->id;
 		}
 		add_filter( 'send_email_change_email', '__return_true' );
+
+		return $current_last_id;
 	}
 
 	// Inserte new user or update an existing user
@@ -240,9 +248,10 @@ class Process {
 	public function process_batch_ajax(): void {
 		$batch        = DCMS_UPDATE_COUNT_BATCH_PROCESS;
 		$total        = $_REQUEST['total'] ?? false;
-		$step         = $_REQUEST['step'] ?? 1; // Inicia en 1 por defecto
+		$step         = $_REQUEST['step'] ?? 1;
+		$last_id      = $_REQUEST['last_id'] ?? 0;
+		$processed    = $_REQUEST['processed'] ?? 0;
 		$delete_users = isset( $_REQUEST['delete'] ) && $_REQUEST['delete'];
-		$count        = ( $step - 1 ) * $batch; // Calcula los procesados hasta el paso anterior
 		$status       = 0;
 		$count_errors = 0;
 
@@ -252,32 +261,30 @@ class Process {
 			return;
 		}
 
-		// Obtener el total en el primer paso
 		if ( ! $total ) {
 			$total = $this->get_total_import_users();
 		}
 
-		// Comprobar si se ha completado antes de procesar
-		if ( $count >= $total && $total > 0 ) {
+		$new_processed = min( (int) $processed + $batch, (int) $total );
+
+		if ( $new_processed >= $total && $total > 0 ) {
 			$status       = 1;
 			$count_errors = $this->count_excluded_items();
+			$processed    = $total;
 
-			// Eliminar usuarios no presentes en el archivo
 			if ( $delete_users ) {
 				$this->process_delete_users();
 			}
 		} else {
-			// Calcular el offset basado en el paso actual
-			$offset = ( $step - 1 ) * $batch;
-			$this->process_import_data( $offset );
+			$last_id   = $this->process_import_data( $last_id );
+			$processed = $new_processed;
 		}
 
-		// Construir la respuesta
 		$res = [
 			'status'       => $status,
-			'step'         => $step + 1, // Enviar el siguiente paso a procesar
-			'count'        => min( $step * $batch, $total ), // Actualizar el contador para la respuesta
-			'batch'        => $batch,
+			'step'         => $step + 1,
+			'processed'    => $processed,
+			'last_id'      => $last_id,
 			'total'        => $total,
 			'count_errors' => $count_errors,
 		];

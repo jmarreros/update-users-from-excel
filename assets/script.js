@@ -35,7 +35,7 @@
             },
             success: function (res) {
                 $('.process-info').html('<span>' + res.message + '</span>');
-                process_upload(1);
+                process_upload(1, null, 0,0);
             },
             complete: function () {
                 $('#form-upload').find('input, button').attr('disabled', false);
@@ -49,11 +49,11 @@
     // Click process button
     $('#process-upload-ajax').click(function (e) {
         e.preventDefault();
-        process_upload(1);
+        process_upload(1, null, 0, 0);
     });
 
     // Process every step
-    function process_upload(step, total = null) {
+    function process_upload(step, total = null, last_id = 0, processed = 0) {
 
         $.ajax({
             url: update_users_vars.ajaxurl,
@@ -63,21 +63,22 @@
                 nonce: update_users_vars.ajaxnonce,
                 total,
                 step,
+                last_id,
+                processed,
                 delete: $('#delete-users').is(':checked') ? 1 : 0
             },
             dataType: 'json',
             success: function (res) {
                 if (res.status === 0) {
-                    // Calcula el número de lotes estimados de forma más precisa
-                    const totalBatches = Math.ceil(res.total / res.batch);
-                    const percentage = Math.round((res.count / res.total) * 100);
+                    const percentage = Math.round((res.processed / res.total) * 100);
 
                     $('.process-info').addClass('processing').html(
-                        `<span>Procesados ${res.count} de ${res.total} (${percentage}%)
-                        <br> Lote: ${res.step} de ${totalBatches}</span>`
+                        `<span>Procesados ${res.processed} de ${res.total} (${percentage}%)
+                    <br> Lote: ${res.step}</span>`
                     );
 
-                    process_upload(res.step, res.total);
+                    // Llamada recursiva con el nuevo last_id y los procesados
+                    process_upload(res.step, res.total, res.last_id, res.processed);
                 } else {
                     if (res.count_errors > 0) {
                         $('.process-info').html('<span>Hubo ' + res.count_errors + ' error(es) al realizar la importación</span>');
@@ -87,11 +88,12 @@
                     }
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 $('.process-info').removeClass('processing').html('<span>Error en el procesamiento: ' + error + '</span>');
                 console.error('Error AJAX:', xhr.responseText);
             }
         });
     }
+
 
 })(jQuery);
