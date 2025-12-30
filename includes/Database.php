@@ -30,11 +30,20 @@ class Database {
 	public function get_import_users_by_batch( int $limit = 0, int $last_id = 0 ): array|object|null {
 		$table_user = $this->wpdb->prefix . "users";
 
+		$columns = "
+	   uu.id, uu.identify, uu.pin, uu.number, uu.reference, uu.nif, uu.name, uu.lastname,
+	   uu.birth, uu.sub_type, uu.address, uu.postal_code, uu.local, uu.country, uu.ayuntamiento,
+	   uu.zone, uu.provincia, uu.email, uu.phone, uu.mobile, uu.soc_type, uu.observation7,
+	   uu.observation5, uu.observation10, uu.observation11, uu.observation19, uu.sub_permit,
+	   uu.observation_person, uu.date_register, uu.roles,
+	   u.id as user_id
+	  ";
+
 		$sql = $this->wpdb->prepare(
-			"SELECT *, u.id user_id FROM $this->table_tmp_import uu
-             LEFT JOIN $table_user u ON uu.identify = u.user_login
-             WHERE uu.excluded = 0 AND uu.id > %d
-             ORDER BY uu.id ASC",
+			"SELECT $columns FROM $this->table_tmp_import uu
+	      LEFT JOIN $table_user u ON uu.identify = u.user_login
+						 WHERE uu.id > %d
+	      ORDER BY uu.id ASC",
 			$last_id
 		);
 
@@ -93,25 +102,25 @@ class Database {
 
 		// Create a temp import table
 		$sql_tmp_import = " CREATE TABLE IF NOT EXISTS $this->table_tmp_import (
-			 `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-						$common_fields,
-						`date_update` datetime DEFAULT NULL,
-						`user_id` bigint(20) DEFAULT NULL,
-						`excluded` tinyint(1) DEFAULT '0',
-						PRIMARY KEY (`id`),
-					 UNIQUE KEY `identify` (`identify`),
-					 KEY `excluded_idx` (`excluded`)
-			  )";
+							`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+							$common_fields,
+							`date_update` datetime DEFAULT NULL,
+							`user_id` bigint(20) DEFAULT NULL,
+							`excluded` tinyint(1) DEFAULT '0',
+							PRIMARY KEY (`id`),
+							UNIQUE KEY `identify` (`identify`),
+							KEY `excluded_idx` (`excluded`)
+							)";
 
 		dbDelta( $sql_tmp_import );
 
 		// Create a user data table
 		$sql_user_data = " CREATE TABLE IF NOT EXISTS $this->table_user_data (
-			 `user_id` bigint(20) unsigned NOT NULL,
-						$common_fields,
-						PRIMARY KEY (`user_id`),
-						UNIQUE KEY `identify` (`identify`)
-			  )";
+					    `user_id` bigint(20) unsigned NOT NULL,
+					      $common_fields,
+					      PRIMARY KEY (`user_id`),
+					      UNIQUE KEY `identify` (`identify`)
+					     )";
 
 		dbDelta( $sql_user_data );
 	}
