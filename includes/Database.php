@@ -69,9 +69,9 @@ class Database {
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 		$common_fields = "
-                    `identify` int(10) unsigned DEFAULT NULL,
+                    `identify` varchar(60) DEFAULT NULL,
                     `pin` varchar(50) DEFAULT NULL,
-                    `number` int(10) unsigned DEFAULT NULL,
+                    `number` varchar(50) DEFAULT NULL,
                     `reference` varchar(50) DEFAULT NULL,
                     `nif` varchar(50) DEFAULT NULL,
                     `name` varchar(150) DEFAULT NULL,
@@ -96,7 +96,7 @@ class Database {
                     `observation19` varchar(250) DEFAULT NULL,
                     `sub_permit`  varchar(100) DEFAULT NULL,
                     `observation_person`  varchar(100) DEFAULT NULL,
-                    `date_register` datetime DEFAULT NULL,
+                    `date_register` varchar(100) DEFAULT NULL,
                     `roles` varchar(250) DEFAULT NULL";
 
 
