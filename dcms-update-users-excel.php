@@ -42,7 +42,7 @@ final class Loader {
 		define( 'DCMS_UPDATE_URL', plugin_dir_url( __FILE__ ) );
 		define( 'DCMS_UPDATE_BASE_NAME', plugin_basename( __FILE__ ) );
 		define( 'DCMS_UPDATE_SUBMENU', 'edit.php?post_type=events_sporting' );
-		define( 'DCMS_UPDATE_COUNT_BATCH_PROCESS', 250 ); // Amount of registers to update every time
+		define( 'DCMS_UPDATE_COUNT_BATCH_PROCESS', 25 ); // Amount of registers to update every time
 		define( 'DCMS_UPDATE_INTERVAL_SECONDS', 900 ); // For cron taks
 		define( 'DCMS_UPDATE_DIRECTORY_UPLOAD', '/file-users-import/' );
 		define( 'DCMS_UPDATE_FILE_NAME_IMPORT', 'list-users-import.xlsx' );
