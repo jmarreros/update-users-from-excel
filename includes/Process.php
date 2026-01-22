@@ -265,19 +265,20 @@ class Process {
 			$total = $this->get_total_import_users();
 		}
 
-		$new_processed = min( (int) $processed + $batch, (int) $total );
+		// Process batch if there are still items to process
+		if ( $processed < $total && $total > 0 ) {
+			$last_id = $this->process_import_data( $last_id );
+			$processed = min( (int) $processed + $batch, (int) $total );
+		}
 
-		if ( $new_processed >= $total && $total > 0 ) {
+		// Check if processing is complete
+		if ( $processed >= $total && $total > 0 ) {
 			$status       = 1;
 			$count_errors = $this->count_excluded_items();
-			$processed    = $total;
 
 			if ( $delete_users ) {
 				$this->process_delete_users();
 			}
-		} else {
-			$last_id   = $this->process_import_data( $last_id );
-			$processed = $new_processed;
 		}
 
 		$res = [
